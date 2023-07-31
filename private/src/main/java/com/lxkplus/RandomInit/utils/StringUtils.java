@@ -1,7 +1,5 @@
 package com.lxkplus.RandomInit.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.helpers.MessageFormatter;
 
 import java.text.SimpleDateFormat;
@@ -9,7 +7,6 @@ import java.util.Date;
 
 public class StringUtils {
 
-    static ObjectMapper mapper = new ObjectMapper();
     static SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
 
     static public String format(String messagePattern, Object arg) {
@@ -33,6 +30,6 @@ public class StringUtils {
         if (o instanceof Date) {
             return ft.format(o);
         }
-        return mapper.convertValue(o, String.class);
+        return JsonUtils.objectMapper.convertValue(o, String.class);
     }
 }

@@ -1,4 +1,5 @@
-CREATE TABLE IF NOT EXISTS ${tableName} (
-    ${rowMessage}
-    ${KeyMessage}
-)ENGINE=${engineName} DEFAULT CHARSET=${charset}
+CREATE TABLE IF NOT EXISTS `${tableName}` (
+    <#list mysqlRows as mysqlRow>
+        ${mysqlRow}
+    </#list>
+)ENGINE=${engineName} DEFAULT CHARSET=${charSet}
