@@ -16,7 +16,9 @@ public enum HandlerEnum {
     bool("true、false"),
     email("email"),
     filePath("文件路径"),
-    passWord("账号密码");
+    passWord("账号密码"),
+    university("城市"),
+    NULL("NULL");
 
     String ruler;
 

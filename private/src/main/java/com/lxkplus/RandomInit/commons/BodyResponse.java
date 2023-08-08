@@ -10,6 +10,7 @@ public class BodyResponse<T> {
     String errorMessage;
     T data;
     String info;
+    String version;
 
     /**
      * 正常处理的时候会生成
@@ -21,5 +22,13 @@ public class BodyResponse<T> {
         this.errorMessage = "OK!";
         this.data = data;
         this.info = info.toString();
+    }
+
+    public BodyResponse(T data, Object info, String version) {
+        this.errorCode = 0;
+        this.errorMessage = "OK!";
+        this.data = data;
+        this.info = info.toString();
+        this.version = version;
     }
 }

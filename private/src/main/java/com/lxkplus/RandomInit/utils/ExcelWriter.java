@@ -1,43 +1,44 @@
 package com.lxkplus.RandomInit.utils;
 
-import com.lxkplus.RandomInit.enums.ErrorEnum;
-import com.lxkplus.RandomInit.exception.NormalErrorException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Resource;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.stereotype.Component;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
-public class ExcelUtils {
+@Component
+public class ExcelWriter {
+
+    @Resource
+    ObjectMapper objectMapper;
 
     /**
      * 将二维列表转化为Excel并进行展示
      * @param data 数据
-     * @param fileName 文件名
-     * @throws NormalErrorException  当数据为空的时候会抛出异常
+     * @param filePath 文件名
      * @throws IOException 写入失败
      */
-    static public void excelMaker(List<List<Object>> data, String fileName)
-            throws NormalErrorException, IOException {
+    public void excelMaker(List<List<String>> data, Path filePath) throws IOException {
         SXSSFWorkbook sxssfWorkbook = new SXSSFWorkbook();
-        if (data.isEmpty() || data.get(0).isEmpty()) {
-            throw new NormalErrorException(ErrorEnum.NotHaveAnyData);
-        }
 
         Sheet sheet1 = sxssfWorkbook.createSheet("sheet1");
         for (int i = 0; i < data.size(); i++) {
             Row row = sheet1.createRow(i);
             for (int j = 0; j < data.get(i).size(); j++) {
                 Cell cell = row.createCell(j);
-                cell.setCellValue(StringUtils.formatToString(data.get(i).get(j)));
+                cell.setCellValue(objectMapper.convertValue(data.get(i).get(j), String.class));
             }
             // 自动设置列宽
             sheet1.autoSizeColumn(i);
         }
-        FileOutputStream fos = new FileOutputStream(fileName);
+        FileOutputStream fos = new FileOutputStream(String.valueOf(filePath));
         sxssfWorkbook.write(fos);
         fos.close();
         sxssfWorkbook.dispose();
