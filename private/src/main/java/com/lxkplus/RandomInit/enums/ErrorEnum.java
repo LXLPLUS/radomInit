@@ -10,7 +10,10 @@ public enum ErrorEnum {
     NotHaveAnyData("没有任何有效数据", -94),
     NotEnoughParams("缺乏必要参数", -93),
     NotHaveRuler("无法匹配任何规则", -92),
-    NULLError("出现空指针异常", -91);
+    NULLError("出现空指针异常", -91),
+    paramNotSupport("对应参数不支持", -90),
+    Empty("数据为空", -100),
+    Exist("对应数据存在且无法覆盖", -89);
 
 
     public String errorName;

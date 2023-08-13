@@ -3,8 +3,6 @@ package com.lxkplus.RandomInit.commons;
 import com.lxkplus.RandomInit.enums.ErrorEnum;
 import com.lxkplus.RandomInit.exception.NormalErrorException;
 
-import java.util.Arrays;
-
 /**
  * 一个简单的定时器，计算耗时用
  */
@@ -17,10 +15,6 @@ public class Timer {
 
     public void flushFinishTime() {
         list[1] = System.currentTimeMillis();
-    }
-
-    public void clear() {
-        Arrays.fill(list, 0L);
     }
 
     public long getSpendMillis() throws NormalErrorException {

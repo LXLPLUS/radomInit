@@ -7,8 +7,17 @@ public enum MysqlEnum {
     FLOAT("FLOAT"),
     DECIMAL("DECIMAL"),
     VARCHAR("VARCHAR"),
+    DATE("DATE"),
     DATETIME("DATETIME"),
     INT("INT"),
+    TEXT("TEXT"),
+    JSON("JSON"),
+    DOUBLE("DOUBLE"),
+    BOOL("BOOL"),
+    LONG("LONG"),
+    TINYINT("TINYINT"),
+    BIGINT("BIGINT"),
+    TIMESTAMP("TIMESTAMP"),
 
     TYPE("TYPE"),
     FIELD("FIELD"),
@@ -23,6 +32,7 @@ public enum MysqlEnum {
 
     NULL("NULL"),
 
+    KEY("KEY"),
     INDEX("KEY"),
     UNIQUE_KEY("UNIQUE KEY"),
     PRIMARY_KEY("PRIMARY KEY"),
