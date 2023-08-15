@@ -1,6 +1,7 @@
 package com.lxkplus.RandomInit.service.impl;
 
 import com.lxkplus.RandomInit.enums.ErrorEnum;
+import com.lxkplus.RandomInit.enums.StatusEnum;
 import com.lxkplus.RandomInit.exception.NormalErrorException;
 import com.lxkplus.RandomInit.exception.ThrowUtils;
 import com.lxkplus.RandomInit.mapper.DatabaseMapper;
@@ -33,8 +34,8 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Pair<String, String> getParams(String databaseName) throws NormalErrorException {
-        ThrowUtils.throwIf(databaseName.startsWith(prefix),
+    public Pair<String, String> getFromRealDatabaseName(String databaseName) throws NormalErrorException {
+        ThrowUtils.throwIf(!databaseName.startsWith(prefix),
                 ErrorEnum.paramNotSupport,
                 "对这个数据库操作是危险的！不是" + prefix);
         databaseName = databaseName.replaceFirst(prefix, "");
@@ -64,26 +65,39 @@ public class DatabaseServiceImpl implements DatabaseService {
         ThrowUtils.throwIf(databaseName.length() > 30, ErrorEnum.paramNotSupport, "数据库名过长！");
     }
 
-    @Override
-    public List<String> getDatabaseByID(String actionId) throws NormalErrorException {
+    private List<String> getRealDatabaseByID(String actionId) throws NormalErrorException {
         checkID(actionId);
         return getAllDatabase().stream()
                 .filter(x -> x.startsWith(prefix + actionId + "_"))
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<String> getDatabaseByID(String actionID) throws NormalErrorException {
+        checkID(actionID);
+        List<String> databaseNameList = getAllDatabase().stream()
+                .filter(x -> x.startsWith(prefix + actionID + "_"))
+                .collect(Collectors.toList());
+
+        List<String> namespaceList = new ArrayList<>();
+        for (String databaseName : databaseNameList) {
+            namespaceList.add(getFromRealDatabaseName(databaseName).getRight());
+        }
+        return namespaceList;
+
+    }
+
 
     @Override
-    public boolean checkDatabaseExist(String actionID, String name) throws NormalErrorException {
-        checkIDAndName(actionID, name);
-        return getAllDatabase().contains(getRealDatabaseName(actionID, name));
+    public boolean checkDatabaseExist(String actionID, String databaseName) throws NormalErrorException {
+        checkIDAndName(actionID, databaseName);
+        return getAllDatabase().contains(getRealDatabaseName(actionID, databaseName));
     }
 
     @Override
-    public String createDatabase(String actionID, String name) throws NormalErrorException {
-
-        checkIDAndName(actionID, name);
-        String nameWithPrefix = getRealDatabaseName(actionID, name);
+    public String createDatabase(String actionID, String databaseID) throws NormalErrorException {
+        checkIDAndName(actionID, databaseID);
+        String nameWithPrefix = getRealDatabaseName(actionID, databaseID);
 
         // 只获取对应前缀的数据库进行操作，防止误伤
         // 对应前缀的数据库必然是一次性的数据库
@@ -107,7 +121,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public List<Map<String, String>> dropDatabaseByID(String actionID) throws NormalErrorException {
         checkID(actionID);
-        List<String> initDatabases = getDatabaseByID(actionID);
+        List<String> initDatabases = getRealDatabaseByID(actionID);
         List<Map<String, String>> deleteAns = new ArrayList<>();
         log.info("删除{}下的所有数据库", actionID);
         log.info("被删除的数据库有{}", StringUtils.join(initDatabases, ","));
@@ -134,10 +148,10 @@ public class DatabaseServiceImpl implements DatabaseService {
     private void deleteAction(List<Map<String, String>> deleteAns, String databaseName) {
         try {
             databaseMapper.dropByName(databaseName);
-            deleteAns.add(Map.of("databaseName", databaseName, "status", "success"));
+            deleteAns.add(Map.of("databaseName", databaseName, "status", StatusEnum.SUCCESS.name()));
         }
         catch (Exception e) {
-            deleteAns.add(Map.of("databaseName", databaseName, "status", "failed"));
+            deleteAns.add(Map.of("databaseName", databaseName, "status", StatusEnum.FAILED.name()));
             log.warn("{} 删除时报错{}", databaseName, e.getCause().toString());
         }
     }
@@ -148,7 +162,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         List<Map<String, String>> deleteAns = new ArrayList<>();
         String databaseName = getRealDatabaseName(actionID, name);
         if (!checkDatabaseExist(actionID, name)) {
-            deleteAns.add(Map.of("databaseName", databaseName, "status", "notExist"));
+            deleteAns.add(Map.of("databaseName", databaseName, "status", StatusEnum.NOT_EXIST.name()));
         }
         deleteAction(deleteAns, databaseName);
         log.info("删除结果： " + deleteAns);

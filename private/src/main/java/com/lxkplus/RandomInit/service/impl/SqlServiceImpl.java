@@ -1,7 +1,6 @@
 package com.lxkplus.RandomInit.service.impl;
 
 import com.alibaba.druid.sql.SQLUtils;
-import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLName;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
@@ -11,43 +10,55 @@ import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlInsertStatement;
 import com.lxkplus.RandomInit.enums.ErrorEnum;
 import com.lxkplus.RandomInit.exception.NormalErrorException;
 import com.lxkplus.RandomInit.exception.ThrowUtils;
-import com.lxkplus.RandomInit.service.CreateSqlService;
-import com.lxkplus.RandomInit.service.RandomService;
+import com.lxkplus.RandomInit.mapper.TableMapper;
+import com.lxkplus.RandomInit.service.*;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class CreateSqlServiceImpl implements CreateSqlService {
+public class SqlServiceImpl implements SqlService {
 
     @Resource
     RandomService randomService;
 
-    @Override
-    public MySqlCreateTableStatement readCreateSql(String sql) throws NormalErrorException {
-        ThrowUtils.throwIfNullOrBlack(sql, "sql数据为空");
-        SQLStatement sqlStatement = SQLUtils.parseSingleMysqlStatement(sql);
-        ThrowUtils.throwIfTypeError(sqlStatement, MySqlCreateTableStatement.class, "类型不是建表语句！");
-        return (MySqlCreateTableStatement) sqlStatement;
-    }
+    @Resource
+    DatabaseService databaseService;
+
+    @Resource
+    StatementService createSqlService;
+
+    @Resource
+    StatementService statementService;
+
+    @Resource
+    TableService tableService;
+
+    @Resource
+    TableMapper tableMapper;
 
     @Override
-    public String statementToCreateDDL(MySqlCreateTableStatement statement) throws NormalErrorException {
-        ThrowUtils.throwIfNull(statement, "解析sql空指针异常");
-        return statement.toString();
-    }
+    public void fillRandomData(String actionID, String databaseName, String tableName, int count) throws NormalErrorException {
 
-    @Override
-    public List<String> createToInsert(String sql, int count) throws NormalErrorException {
-        MySqlCreateTableStatement statement = readCreateSql(sql);
+        ThrowUtils.throwIf(!tableService.checkTableExist(actionID, databaseName, tableName),
+                ErrorEnum.Empty,
+                "对应的数据库表不存在");
+
+        String realDatabaseName = databaseService.getRealDatabaseName(actionID, databaseName);
+
+        String createDDL = tableService.getTableDDL(actionID, databaseName, tableName);
+        MySqlCreateTableStatement statement = statementService.readCreateSql(createDDL);
         ThrowUtils.throwIf(count <= 0, ErrorEnum.paramNotSupport, "数据规模为非正数");
 
+        // 将建表语句转化为sql
         MySqlInsertStatement mySqlInsertStatement = new MySqlInsertStatement();
-        // 表名
+
+        // 拦截sql并引导到另外一个数据库
         mySqlInsertStatement.setTableName(statement.getName());
+        mySqlInsertStatement.getTableSource().setSchema(realDatabaseName);
+
         for (SQLTableElement sqlColumn : statement.getTableElementList()) {
             if (sqlColumn instanceof SQLColumnDefinition dataRow) {
                 // 写入列名
@@ -57,22 +68,20 @@ public class CreateSqlServiceImpl implements CreateSqlService {
             }
         }
 
-        List<String> sqlList = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             SQLInsertStatement.ValuesClause valuesClause = new SQLInsertStatement.ValuesClause();
             for (SQLTableElement sqlColumn : statement.getTableElementList()) {
                 if (sqlColumn instanceof SQLColumnDefinition dataRow) {
-                    String name = dataRow.getDataType().getName();
-                    List<SQLExpr> arguments = dataRow.getDataType().getArguments();
-                    Object dataByRow = randomService.randomByColumn(dataRow);
-                    Object dataByType = randomService.randomByType(name, arguments);
-                    valuesClause.addValue(dataByRow != null ? dataByRow: dataByType);
+                    Object dataByRow = randomService.randomByColumn(actionID, dataRow, mySqlInsertStatement);
+                    if (dataByRow == null) {
+                        dataByRow = randomService.randomByType(actionID, dataRow, mySqlInsertStatement);
+                    }
+                    valuesClause.addValue(dataByRow);
                 }
             }
             mySqlInsertStatement.setValues(valuesClause);
-            sqlList.add(mySqlInsertStatement + ";");
+            tableMapper.FillRandomData(mySqlInsertStatement.toString());
         }
-    return sqlList;
     }
 
     @Override
@@ -83,7 +92,7 @@ public class CreateSqlServiceImpl implements CreateSqlService {
 
         // 检查是否存在 * 字符
         if (queryBlock.selectItemHasAllColumn()) {
-            MySqlCreateTableStatement statement = readCreateSql(createSql);
+            MySqlCreateTableStatement statement = createSqlService.readCreateSql(createSql);
 
             // 清空列
             List<SQLSelectItem> selectList = queryBlock.getSelectList();
@@ -101,4 +110,5 @@ public class CreateSqlServiceImpl implements CreateSqlService {
 
         return sqlStatement.toString();
     }
+
 }

@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 public interface DatabaseMapper {
-    @Select("show databases")
+    @Select("show databases like 'randomInit_temp_%'")
     List<String> getExistDatabase();
 
     @Insert("create database ${name}")

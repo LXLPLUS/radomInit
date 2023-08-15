@@ -1,12 +1,12 @@
 package com.lxkplus.RandomInit.service;
 
-import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlInsertStatement;
 import com.lxkplus.RandomInit.exception.NormalErrorException;
 
-import java.util.List;
-
 public interface RandomService {
-    Object randomByType(String type, List<SQLExpr> arguments) throws NormalErrorException;
-    Object randomByColumn(SQLColumnDefinition sqlColumnDefinition);
+
+    Object randomByType(String actionID, SQLColumnDefinition sqlColumnDefinition, MySqlInsertStatement mySqlInsertStatement) throws NormalErrorException;
+
+    Object randomByColumn(String actionID, SQLColumnDefinition sqlColumnDefinition, MySqlInsertStatement mySqlInsertStatement);
 }
