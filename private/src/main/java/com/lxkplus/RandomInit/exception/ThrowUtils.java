@@ -52,19 +52,14 @@ public class ThrowUtils {
 
     /**
      * 检查是否是空指针，如果是空指针或者空列表那么抛出异常
-     * @param o 类
      * @param msg 异常信息
      * @throws NormalErrorException 抛出异常
      */
-    public static void throwIfNullOrEmpty(Object o, String msg) throws NormalErrorException {
-        if (Objects.isNull(o)) {
+    public static void throwIfNullOrEmpty(Iterable<Objects> iterable, String msg) throws NormalErrorException {
+        if (Objects.isNull(iterable)) {
             throw new NormalErrorException(ErrorEnum.NULLError, msg);
         }
-        if (o instanceof Iterable iterable) {
-            if (!iterable.iterator().hasNext()) {
-                throw new NormalErrorException(ErrorEnum.NULLError, msg);
-            }
-        } else if (o instanceof String && ((String) o).isEmpty()){
+        if (!iterable.iterator().hasNext()) {
             throw new NormalErrorException(ErrorEnum.NULLError, msg);
         }
     }

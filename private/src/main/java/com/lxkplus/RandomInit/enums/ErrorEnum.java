@@ -13,7 +13,8 @@ public enum ErrorEnum {
     NULLError("出现空指针异常", -91),
     paramNotSupport("对应参数不支持", -90),
     Empty("数据为空", -100),
-    Exist("对应数据存在且无法覆盖", -89);
+    Exist("对应数据存在且无法覆盖", -89),
+    NotExist("查询的数据不存在!", -87);
 
 
     public String errorName;

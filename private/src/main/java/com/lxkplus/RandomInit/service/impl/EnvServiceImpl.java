@@ -3,36 +3,46 @@ package com.lxkplus.RandomInit.service.impl;
 import com.lxkplus.RandomInit.service.EnvService;
 import org.springframework.stereotype.Service;
 
-import java.util.StringJoiner;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class EnvServiceImpl implements EnvService {
 
-    private final ConcurrentHashMap<String, ConcurrentHashMap<String, String>> envMap = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, String> defaultMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, List<String>>> globalEnvMap = new ConcurrentHashMap<>();
 
-    EnvServiceImpl() {
-        // todo 实现这个方法
-        defaultMap.put("map-underscore-to-camel-case", "true");
+    private ConcurrentHashMap<String, List<String>> getDefaultMap(String actionID) {
+        ConcurrentHashMap<String, List<String>> temp = new ConcurrentHashMap<>();
+        temp.put("actionID", List.of(actionID));
+        return temp;
     }
 
     @Override
-    public String getENV(String actionID, String key) {
-        ConcurrentHashMap<String, String> actionEnvMap = envMap.computeIfAbsent(actionID, k -> new ConcurrentHashMap<>(defaultMap));
-        return actionEnvMap.getOrDefault(key, null);
+    public List<String> getEnv(String actionID, String key) {
+        ConcurrentHashMap<String, List<String>> actionEnvMap;
+        actionEnvMap = globalEnvMap.computeIfAbsent(actionID, k -> getDefaultMap(actionID));
+        return actionEnvMap.getOrDefault(key, Collections.emptyList());
+    }
+
+    @Override
+    public void setEnv(String actionID, String key, List<String> value) {
+        globalEnvMap.computeIfAbsent(actionID, k -> getDefaultMap(actionID)).put(key, value);
     }
 
     @Override
     public void setEnv(String actionID, String key, String value) {
-        envMap.computeIfAbsent(actionID, k -> new ConcurrentHashMap<>(defaultMap)).put(key, value);
+        globalEnvMap.computeIfAbsent(actionID, k -> getDefaultMap(actionID)).put(key, new ArrayList<>(List.of(value)));
     }
 
     @Override
-    public String getAllEnv(String actionID) {
-        ConcurrentHashMap<String, String> actionEnvMap = envMap.getOrDefault(actionID, new ConcurrentHashMap<>(defaultMap));
-        StringJoiner stringJoiner = new StringJoiner("\n");
-        actionEnvMap.forEach((key, value) -> stringJoiner.add(String.format("%s = %s", key, value)));
-        return stringJoiner.toString();
+    public void deleteEnv(String actionID) {
+        globalEnvMap.remove(actionID);
+    }
+
+    @Override
+    public ConcurrentHashMap<String, List<String>> getAllEnv(String actionID) {
+        return globalEnvMap.getOrDefault(actionID, new ConcurrentHashMap<>());
     }
 }

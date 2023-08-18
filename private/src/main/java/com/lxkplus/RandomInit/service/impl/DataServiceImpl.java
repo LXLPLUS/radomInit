@@ -10,16 +10,19 @@ import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlInsertStatement;
 import com.lxkplus.RandomInit.enums.ErrorEnum;
 import com.lxkplus.RandomInit.exception.NormalErrorException;
 import com.lxkplus.RandomInit.exception.ThrowUtils;
-import com.lxkplus.RandomInit.mapper.TableMapper;
+import com.lxkplus.RandomInit.mapper.TableActionMapper;
 import com.lxkplus.RandomInit.service.*;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class SqlServiceImpl implements SqlService {
+public class DataServiceImpl implements DataService {
 
     @Resource
     RandomService randomService;
@@ -37,20 +40,23 @@ public class SqlServiceImpl implements SqlService {
     TableService tableService;
 
     @Resource
-    TableMapper tableMapper;
+    TableActionMapper tableMapper;
+
+    @Resource
+    MysqlCheckService mysqlCheckService;
 
     @Override
-    public void fillRandomData(String actionID, String databaseName, String tableName, int count) throws NormalErrorException {
+    public void fillRandomData(String actionID, String userDatabaseName, String tableName, int count) throws NormalErrorException {
 
-        ThrowUtils.throwIf(!tableService.checkTableExist(actionID, databaseName, tableName),
+        ThrowUtils.throwIf(!mysqlCheckService.checkTableExist(actionID, userDatabaseName, tableName, false),
                 ErrorEnum.Empty,
                 "对应的数据库表不存在");
-
-        String realDatabaseName = databaseService.getRealDatabaseName(actionID, databaseName);
-
-        String createDDL = tableService.getTableDDL(actionID, databaseName, tableName);
-        MySqlCreateTableStatement statement = statementService.readCreateSql(createDDL);
         ThrowUtils.throwIf(count <= 0, ErrorEnum.paramNotSupport, "数据规模为非正数");
+
+        String realDatabaseName = databaseService.getRealDatabaseName(actionID, userDatabaseName);
+
+        String createDDL = tableService.getTableDDL(actionID, userDatabaseName, tableName);
+        MySqlCreateTableStatement statement = statementService.readCreateSql(createDDL);
 
         // 将建表语句转化为sql
         MySqlInsertStatement mySqlInsertStatement = new MySqlInsertStatement();
@@ -72,15 +78,18 @@ public class SqlServiceImpl implements SqlService {
             SQLInsertStatement.ValuesClause valuesClause = new SQLInsertStatement.ValuesClause();
             for (SQLTableElement sqlColumn : statement.getTableElementList()) {
                 if (sqlColumn instanceof SQLColumnDefinition dataRow) {
-                    Object dataByRow = randomService.randomByColumn(actionID, dataRow, mySqlInsertStatement);
-                    if (dataByRow == null) {
-                        dataByRow = randomService.randomByType(actionID, dataRow, mySqlInsertStatement);
+                    Object dataFill = randomService.randomByRuler(actionID, dataRow, mySqlInsertStatement);
+                    if (dataFill == null) {
+                        dataFill = randomService.randomByColumn(actionID, dataRow, mySqlInsertStatement);
                     }
-                    valuesClause.addValue(dataByRow);
+                    if (dataFill == null) {
+                        dataFill = randomService.randomByType(actionID, dataRow, mySqlInsertStatement);
+                    }
+                    valuesClause.addValue(dataFill);
                 }
             }
             mySqlInsertStatement.setValues(valuesClause);
-            tableMapper.FillRandomData(mySqlInsertStatement.toString());
+            tableMapper.fillRandomData(mySqlInsertStatement.toString());
         }
     }
 
@@ -109,6 +118,33 @@ public class SqlServiceImpl implements SqlService {
         }
 
         return sqlStatement.toString();
+    }
+
+    @Override
+    public List<LinkedHashMap<String, String>> getAllDataMap(String actionID, String userDatabaseName, String tableName) {
+        String realDatabaseName = databaseService.getRealDatabaseName(actionID, userDatabaseName);
+
+        return tableMapper.getData(realDatabaseName, tableName);
+    }
+
+    @Override
+    public List<List<String>> getAllDataList(String actionID, String userDatabaseName, String tableName, boolean headExist) {
+        List<LinkedHashMap<String, String>> allDataMap = getAllDataMap(actionID, userDatabaseName, tableName);
+        if (allDataMap == null || allDataMap.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<List<String>> dataList = new ArrayList<>();
+        if (headExist) {
+            dataList.add(new ArrayList<>(allDataMap.get(0).keySet()));
+        }
+
+        allDataMap.forEach(x -> dataList.add(new ArrayList<>(x.values())));
+        return dataList;
+    }
+
+    @Override
+    public List<List<String>> getAllDataList(String actionID, String userDatabaseName, String tableName) {
+        return getAllDataList(actionID, userDatabaseName, tableName, true);
     }
 
 }

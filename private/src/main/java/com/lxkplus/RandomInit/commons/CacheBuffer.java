@@ -17,6 +17,8 @@ public class CacheBuffer {
     @Resource
     JsonUtils jsonUtils;
 
+    final String sep = "%";
+
     ConcurrentMap<String, Long>  increaseCache;
     ConcurrentMap<String, Date>  timeCache;
 
@@ -34,25 +36,29 @@ public class CacheBuffer {
         timeCache = build2.asMap();
     }
 
-    public long getIncrease(String str, long startNumber, long minStep, long maxStep) {
+    public long getIncrease(String actionID, String str, long startNumber, long minStep, long maxStep) {
+        str = actionID + sep + str;
         long num = increaseCache.getOrDefault(str, startNumber - 1);
         increaseCache.put(str, num + jsonUtils.faker.number().numberBetween(minStep, maxStep));
         return increaseCache.get(str);
     }
 
-    public long getIncrease(String str, long startNumber) {
+    public long getIncrease(String actionID, String str, long startNumber) {
+        str = actionID + sep + str;
         Long num = increaseCache.getOrDefault(str, startNumber - 1);
         increaseCache.put(str, num + 1);
         return increaseCache.get(str);
     }
 
-    public Date getTime(String str, Date startTime, int minSecond, int maxSecond) {
+    public Date getTime(String actionID, String str, Date startTime, int minSecond, int maxSecond) {
+        str = actionID + sep + str;
         Date time = DateUtils.addSeconds(timeCache.getOrDefault(str, startTime), jsonUtils.faker.number().numberBetween(minSecond, maxSecond));
         timeCache.put(str, time);
         return timeCache.get(str);
     }
 
-    public Date getTime(String str, Date startTime) {
+    public Date getTime(String actionID, String str, Date startTime) {
+        str = actionID + sep + str;
         Date time = DateUtils.addSeconds(timeCache.getOrDefault(str, startTime), 60);
         timeCache.put(str, time);
         return timeCache.get(str);
