@@ -17,6 +17,7 @@ import com.lxkplus.RandomInit.service.MysqlCheckService;
 import com.lxkplus.RandomInit.service.RandomService;
 import com.lxkplus.RandomInit.utils.JsonUtils;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@Slf4j
 public class RandomServiceImpl implements RandomService {
 
     @Resource
@@ -51,11 +53,6 @@ public class RandomServiceImpl implements RandomService {
     public boolean registerRuler(String actionID, String userDatabaseName,
                                  String tableName, String column, String builderRuler,
                                  List<String> params) throws NormalErrorException {
-        boolean exist = mysqlCheckService.checkColumnExist(actionID, userDatabaseName, tableName, column, false);
-        if (!exist) {
-            return false;
-        }
-
         ColumnInfo columnInfo = new ColumnInfo();
         columnInfo.setActionID(actionID);
         columnInfo.setUserDatabaseName(userDatabaseName);
@@ -65,7 +62,14 @@ public class RandomServiceImpl implements RandomService {
         columnInfo.setParams(StringUtils.join(params, " "));
         columnInfo.setInsertTime(new Date());
 
+        boolean exist = mysqlCheckService.checkColumnExist(actionID, userDatabaseName, tableName, column, false);
+        if (!exist) {
+            log.warn("因为对应列不存在，导致注入规则失败！{}", columnInfo);
+            return false;
+        }
+
         columnInfoMapper.insert(columnInfo);
+        log.info("注入规则成功! {}", columnInfo);
         return true;
     }
 

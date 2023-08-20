@@ -7,7 +7,6 @@ import lombok.ToString;
 @ToString
 public class ViewInfo {
     String userDatabaseName;
-
     String tableName;
     String sql;
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lxkplus.RandomInit.mapper.ActionLogMapper">
+    <select id="selectMessage" resultType="com.lxkplus.RandomInit.model.ActionLog">
+        select id,
+        action_id as `actionID`,
+        step,
+        `level`,
+        `message`,
+        insert_time
+        from randominit.action_log
+        where action_id = #{actionID}
+        <if test="step != null">
+            and step = #{step}
+        </if>
+        <if test="level != null">
+            and level > #{level}
+        </if>
+    </select>
+</mapper>

@@ -48,7 +48,7 @@ public class MysqlCheckServiceImpl implements MysqlCheckService {
         checkDataBaseNameSafe(userDatabaseName);
         boolean empty = (tableExistMapper.getUserDatabaseCount(actionID, userDatabaseName) == 0);
         if (strict && empty) {
-            throw new NormalErrorException(ErrorEnum.NotExist, "查询的数据库不存在！");
+            throw new NormalErrorException(ErrorEnum.NotExist, "查询的数据库" + userDatabaseName + "不存在！");
         }
         return !empty;
     }

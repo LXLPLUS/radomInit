@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class DatabaseServiceImpl implements DatabaseService {
 
     static final String prefix = "randomInit_temp_".toLowerCase();
-    static final String defaultName = "default";
+    static final String defaultDatabaseName = "default";
 
     @Resource
     MysqlCheckService mysqlCheckService;
@@ -82,7 +82,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public String createDatabase(String actionID) throws NormalErrorException {
         mysqlCheckService.checkTableNameSafe(actionID);
-        return createDatabase(actionID, defaultName);
+        return createDatabase(actionID, defaultDatabaseName);
     }
 
     @Override

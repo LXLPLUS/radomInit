@@ -32,7 +32,7 @@ public class EnvServiceImpl implements EnvService {
     }
 
     @Override
-    public void setEnv(String actionID, String key, String value) {
+    public void setEnv(String actionID, String key, String... value) {
         globalEnvMap.computeIfAbsent(actionID, k -> getDefaultMap(actionID)).put(key, new ArrayList<>(List.of(value)));
     }
 

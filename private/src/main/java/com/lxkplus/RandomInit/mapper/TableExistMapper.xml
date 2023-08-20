@@ -16,8 +16,9 @@
 
     <select id="getTable" resultType="com.lxkplus.RandomInit.model.MysqlTable">
         select
-        TABLE_SCHEMA as `user_namespace`,
-        TABLE_NAME as `table_name`
+        TABLE_SCHEMA as `namespaceName`,
+        TABLE_NAME as `table_name`,
+        TABLE_TYPE as `tableType`
         from information_schema.TABLES t
         where t.TABLE_SCHEMA like concat('randomInit_temp_', #{actionID}, '_%')
         <if test="userDatabaseName != null">

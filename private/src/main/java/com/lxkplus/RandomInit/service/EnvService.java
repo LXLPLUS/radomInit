@@ -8,7 +8,7 @@ public interface EnvService {
 
     void setEnv(String actionID, String key, List<String> value);
 
-    void setEnv(String actionID, String key, String value);
+    void setEnv(String actionID, String key, String... value);
 
     void deleteEnv(String actionID);
 
