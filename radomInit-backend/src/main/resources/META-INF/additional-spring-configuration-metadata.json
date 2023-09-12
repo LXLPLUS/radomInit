@@ -1,8 +1,0 @@
-{
-  "properties": [
-    {
-      "name": "randomInit.destroy-all-exist",
-      "type": "java.lang.Boolean",
-      "description": "Description for randomInit.destroy-all-exist."
-    }
-  ] }

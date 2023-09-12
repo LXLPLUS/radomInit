@@ -4,6 +4,7 @@ package com.lxkplus.RandomInit.exception;
 import com.lxkplus.RandomInit.enums.ErrorEnum;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public class ThrowUtils {
@@ -55,7 +56,7 @@ public class ThrowUtils {
      * @param msg 异常信息
      * @throws NormalErrorException 抛出异常
      */
-    public static void throwIfNullOrEmpty(Iterable<Objects> iterable, String msg) throws NormalErrorException {
+    public static void throwIfNullOrEmpty(Collection<?> iterable, String msg) throws NormalErrorException {
         if (Objects.isNull(iterable)) {
             throw new NormalErrorException(ErrorEnum.NULLError, msg);
         }

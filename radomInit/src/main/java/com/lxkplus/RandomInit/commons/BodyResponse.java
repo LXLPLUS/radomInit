@@ -24,6 +24,12 @@ public class BodyResponse<T> {
         this.info = info.toString();
     }
 
+    public BodyResponse(T data) {
+        this.errorCode = 0;
+        this.errorMessage = "OK!";
+        this.data = data;
+    }
+
     public BodyResponse(T data, Object info, String version) {
         this.errorCode = 0;
         this.errorMessage = "OK!";

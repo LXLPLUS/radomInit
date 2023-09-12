@@ -2,7 +2,7 @@ package com.lxkplus.RandomInit.service.impl;
 
 import com.lxkplus.RandomInit.exception.NormalErrorException;
 import com.lxkplus.RandomInit.mapper.ActionLogMapper;
-import com.lxkplus.RandomInit.model.DBModel.LogMessage;
+import com.lxkplus.RandomInit.model.DO.LogMessage;
 import com.lxkplus.RandomInit.service.LogService;
 import com.lxkplus.RandomInit.service.MysqlCheckService;
 import jakarta.annotation.Resource;

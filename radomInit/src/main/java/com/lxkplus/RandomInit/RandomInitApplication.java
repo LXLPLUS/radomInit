@@ -11,5 +11,4 @@ public class RandomInitApplication {
     public static void main(String[] args) {
         SpringApplication.run(RandomInitApplication.class, args);
     }
-
 }

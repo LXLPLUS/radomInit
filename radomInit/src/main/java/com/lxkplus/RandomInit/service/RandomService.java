@@ -3,7 +3,9 @@ package com.lxkplus.RandomInit.service;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlInsertStatement;
 import com.lxkplus.RandomInit.exception.NormalErrorException;
-import com.lxkplus.RandomInit.model.DBModel.ColumnBuilderInfo;
+import com.lxkplus.RandomInit.model.DO.ColumnBuilderInfo;
+import com.lxkplus.RandomInit.model.VO.BuildRuler;
+import com.lxkplus.RandomInit.model.VO.RegisterRulerVo;
 
 import java.util.List;
 
@@ -28,7 +30,6 @@ public interface RandomService {
 
     List<ColumnBuilderInfo> getRulerList(String actionID) throws NormalErrorException;
 
-
     void clearRulers(String actionID) throws NormalErrorException;
 
     Object randomByRuler(String buildRuler, List<String> params) throws NormalErrorException;
@@ -44,4 +45,8 @@ public interface RandomService {
     Object randomByType(String actionID, SQLColumnDefinition sqlColumnDefinition, MySqlInsertStatement mySqlInsertStatement) throws NormalErrorException;
 
     Object randomByColumn(String actionID, SQLColumnDefinition sqlColumnDefinition, MySqlInsertStatement mySqlInsertStatement) throws NormalErrorException;
+
+    List<String> getDataByRegex(BuildRuler buildRuler) throws NormalErrorException;
+
+    void registerRegexRuler(RegisterRulerVo registerRulerVo) throws NormalErrorException;
 }

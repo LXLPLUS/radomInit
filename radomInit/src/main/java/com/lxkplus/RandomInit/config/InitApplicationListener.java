@@ -56,7 +56,7 @@ public class InitApplicationListener implements ApplicationListener<ContextRefre
                 """);
 
         tableActionMapper.createTable("""
-                CREATE TABLE `t_pool_register` (
+                CREATE TABLE IF NOT EXISTS`t_pool_register` (
                   `id` int NOT NULL AUTO_INCREMENT,
                   `action_id` varchar(100) DEFAULT NULL,
                   `pool_name` varchar(100) DEFAULT NULL,

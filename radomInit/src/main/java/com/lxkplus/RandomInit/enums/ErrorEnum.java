@@ -14,7 +14,9 @@ public enum ErrorEnum {
     paramNotSupport("对应参数不支持", -90),
     Empty("数据为空", -100),
     Exist("对应数据存在且无法覆盖", -89),
-    NotExist("查询的数据不存在!", -87);
+    NotExist("查询的数据不存在!", -87),
+    Unauthorized("未登录", -401),
+    passWordError("密码错误", -402);
 
 
     public String errorName;

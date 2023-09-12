@@ -11,7 +11,7 @@ import com.lxkplus.RandomInit.enums.ErrorEnum;
 import com.lxkplus.RandomInit.exception.NormalErrorException;
 import com.lxkplus.RandomInit.exception.ThrowUtils;
 import com.lxkplus.RandomInit.mapper.TableActionMapper;
-import com.lxkplus.RandomInit.model.DBModel.ColumnBuilderInfo;
+import com.lxkplus.RandomInit.model.DO.ColumnBuilderInfo;
 import com.lxkplus.RandomInit.service.*;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

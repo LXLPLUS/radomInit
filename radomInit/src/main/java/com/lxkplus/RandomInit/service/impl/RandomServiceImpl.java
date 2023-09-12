@@ -5,6 +5,7 @@ import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlInsertStatement;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lxkplus.RandomInit.commons.BodyResponse;
 import com.lxkplus.RandomInit.commons.CacheBuffer;
 import com.lxkplus.RandomInit.enums.ErrorEnum;
 import com.lxkplus.RandomInit.enums.MysqlEnum;
@@ -12,11 +13,15 @@ import com.lxkplus.RandomInit.exception.NormalErrorException;
 import com.lxkplus.RandomInit.exception.ThrowUtils;
 import com.lxkplus.RandomInit.mapper.ColumnBuilderInfoMapper;
 import com.lxkplus.RandomInit.mapper.PoolRegisterMapper;
-import com.lxkplus.RandomInit.model.DBModel.ColumnBuilderInfo;
-import com.lxkplus.RandomInit.model.DBModel.PoolRegister;
-import com.lxkplus.RandomInit.service.SchemaService;
+import com.lxkplus.RandomInit.mapper.RulerRegisterMapper;
+import com.lxkplus.RandomInit.model.DO.ColumnBuilderInfo;
+import com.lxkplus.RandomInit.model.DO.PoolRegister;
+import com.lxkplus.RandomInit.model.DO.RegexRegisterDo;
+import com.lxkplus.RandomInit.model.VO.BuildRuler;
+import com.lxkplus.RandomInit.model.VO.RegisterRulerVo;
 import com.lxkplus.RandomInit.service.MysqlCheckService;
 import com.lxkplus.RandomInit.service.RandomService;
+import com.lxkplus.RandomInit.service.SchemaService;
 import com.lxkplus.RandomInit.utils.JsonUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +52,9 @@ public class RandomServiceImpl implements RandomService {
 
     @Resource
     ColumnBuilderInfoMapper columnBuilderInfoMapper;
+
+    @Resource
+    RulerRegisterMapper rulerRegisterMapper;
 
     @Resource
     CacheBuffer cacheBuffer;
@@ -362,6 +370,51 @@ public class RandomServiceImpl implements RandomService {
             return cacheBuffer.getTime(actionID, tableMessage, startTime);
         }
         return null;
+    }
+
+    @Override
+    public List<String> getDataByRegex(BuildRuler buildRuler) throws NormalErrorException {
+        ThrowUtils.throwIfNullOrEmpty(buildRuler.getParams(), "缺乏必要参数");
+        try {
+            jsonUtils.faker.regexify(buildRuler.getParams().get(0));
+        } catch (Exception e) {
+            throw new NormalErrorException(ErrorEnum.NotExist, "正则表达式不支持！");
+        }
+        List<String> ans = new ArrayList<>();
+        for (int i = 0; i < buildRuler.getCount(); i++) {
+            ans.add(jsonUtils.faker.regexify(buildRuler.getParams().get(0)));
+            if (ans.get(i).length() > 1e5) {
+                throw new NormalErrorException(ErrorEnum.LengthTooLong);
+            }
+        }
+        return ans;
+    }
+
+    @Override
+    public void registerRegexRuler(RegisterRulerVo registerRulerVo) throws NormalErrorException {
+
+        // 检查规则是否已经注册
+        List<RegexRegisterDo> regexRegisterDos = rulerRegisterMapper.selectByMap(Map.of("action_id", registerRulerVo.getActionID(),
+                "params", registerRulerVo.getParams()));
+
+        if (!regexRegisterDos.isEmpty()) {
+            throw new NormalErrorException(ErrorEnum.Exist, "规则已经存在");
+        }
+
+        // 填入一次默认值
+        BuildRuler buildRuler = new BuildRuler();
+        buildRuler.setParams(List.of(registerRulerVo.getParams()));
+        buildRuler.setCount(1);
+        String example = getDataByRegex(buildRuler).get(0);
+
+        // 写入数据库
+        RegexRegisterDo regexRegisterDo = new RegexRegisterDo();
+        regexRegisterDo.setActionID(registerRulerVo.getActionID());
+        regexRegisterDo.setParams(registerRulerVo.getParams());
+        regexRegisterDo.setInsertTime(new Date());
+        regexRegisterDo.setRulerType(registerRulerVo.getRulerType());
+        regexRegisterDo.setExample(example);
+        rulerRegisterMapper.insert(regexRegisterDo);
     }
 
 }
