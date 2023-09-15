@@ -10,7 +10,7 @@ public interface DatabaseMapper {
     @Select("show databases like 'randomInit_temp_%'")
     List<String> getExistDatabase();
 
-    @Insert("create database ${realSchemaName}")
+    @Insert("create database if not exists ${realSchemaName}")
     void createDatabase(String realSchemaName);
 
     @Delete("drop database ${realSchemaName}")

@@ -1,6 +1,7 @@
 <template>
   <n-grid x-gap="12" :cols="2">
     <n-gi>
+      <div>正则表达式输入:</div>
       <n-input
           v-model:value="regex"
           type="textarea"
@@ -27,26 +28,20 @@
       <RegexRuler/>
     </n-gi>
     <n-gi>
-      <n-button strong secondary style="text-align: right" type="info" @click="copy">
-        复制到剪贴板
-      </n-button>
-      <br>
-        <n-card style="min-height: 800px" :embedded="true">
-          <n-code :code="code" language="javascript" show-line-numbers/>
-        </n-card>
+      <Code v-model:code="code"/>
     </n-gi>
   </n-grid>
 </template>
 
 <script lang="ts">
-import {ref} from "vue"
+import { ref } from "vue"
 import { useMessage } from "naive-ui";
-import clipboard3 from 'vue-clipboard3';
+import Code from "./Code.vue"
 import RegexRuler from "./RegexRuler.vue"
 
 export default {
   name: "Regex",
-  components: {RegexRuler},
+  components: {Code, RegexRuler},
   setup() {
     const message = useMessage()
     let defaultInput = ref("[0-9]{1,12}")
@@ -55,23 +50,12 @@ export default {
     let count = ref(10)
 
     const marks = {
-      1: '1',
       10: '10',
       20: '20',
-      50: '50'
+      30: '30',
+      40: '40',
+      50: "50"
     }
-
-    const { toClipboard } = clipboard3();
-
-    async function copy() {
-      try {
-        await toClipboard(code.value)
-        message.info("复制成功")
-      } catch (Error) {
-        message.warning("复制失败")
-      }
-    }
-
     async function checkRegex() {
 
       let data = regex.value
@@ -144,7 +128,6 @@ export default {
       checkRegex,
       count,
       marks,
-      copy,
       intoDB
     }
   }

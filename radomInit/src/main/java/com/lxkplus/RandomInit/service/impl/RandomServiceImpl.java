@@ -5,7 +5,6 @@ import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlInsertStatement;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lxkplus.RandomInit.commons.BodyResponse;
 import com.lxkplus.RandomInit.commons.CacheBuffer;
 import com.lxkplus.RandomInit.enums.ErrorEnum;
 import com.lxkplus.RandomInit.enums.MysqlEnum;
@@ -19,6 +18,7 @@ import com.lxkplus.RandomInit.model.DO.PoolRegister;
 import com.lxkplus.RandomInit.model.DO.RegexRegisterDo;
 import com.lxkplus.RandomInit.model.VO.BuildRuler;
 import com.lxkplus.RandomInit.model.VO.RegisterRulerVo;
+import com.lxkplus.RandomInit.model.VO.SelectOption;
 import com.lxkplus.RandomInit.service.MysqlCheckService;
 import com.lxkplus.RandomInit.service.RandomService;
 import com.lxkplus.RandomInit.service.SchemaService;
@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -165,6 +166,9 @@ public class RandomServiceImpl implements RandomService {
         if (StringUtils.isBlank(buildRuler)) {
             return null;
         }
+        if (params == null) {
+            params = Collections.emptyList();
+        }
         switch (buildRuler){
             case "string":
             case "字符串":
@@ -182,6 +186,12 @@ public class RandomServiceImpl implements RandomService {
                     return RandomStringUtils.randomPrint(Integer.parseInt(params.get(0)), Integer.parseInt(params.get(1)))
                             .replaceAll("['\"\\\\{}]", "");
                 }
+            case "string|param1":
+                return RandomStringUtils.randomPrint(0, Integer.parseInt(params.get(0)))
+                    .replaceAll("['\"\\\\{}]", "");
+            case "string|param1|param2":
+                return RandomStringUtils.randomPrint(Integer.parseInt(params.get(0)), Integer.parseInt(params.get(1)))
+                        .replaceAll("['\"\\\\{}]", "");
             case "正则":
             case "正则表达式":
             case "regex":
@@ -200,6 +210,10 @@ public class RandomServiceImpl implements RandomService {
                     return jsonUtils.faker.number().numberBetween(Long.parseLong(params.get(0)), Integer.MAX_VALUE / 2);
                 }
                 return jsonUtils.faker.number().numberBetween(Long.parseLong(params.get(0)), Long.parseLong(params.get(1)));
+            case "range|param1":
+                return jsonUtils.faker.number().numberBetween(Long.parseLong(params.get(0)), Integer.MAX_VALUE / 2);
+            case "range|param1|param2":
+                return jsonUtils.faker.number().numberBetween(Long.parseLong(params.get(0)), Long.parseLong(params.get(1)));
             case "时间":
             case "time":
                 Date startTime = DateUtils.addDays(new Date(), -100);
@@ -216,6 +230,15 @@ public class RandomServiceImpl implements RandomService {
                 }
                 return jsonUtils.faker.date().between(startTime, endTime);
 
+            case "time|param1":
+                startTime = DateUtils.addDays(new Date(), -100);
+                endTime = DateUtils.addDays(new Date(), 100);
+                try {
+                    startTime = DateUtils.parseDate(params.get(0), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                return jsonUtils.faker.date().between(startTime, endTime);
             case "正数":
                 return jsonUtils.faker.number().numberBetween(1, Integer.MAX_VALUE / 10);
             case "手机号":
@@ -228,6 +251,7 @@ public class RandomServiceImpl implements RandomService {
             case "url":
                 return jsonUtils.faker.internet().url();
             case "名字":
+            case "name":
                 return jsonUtils.faker.name().name();
             case "default":
             case "默认值":
@@ -243,7 +267,8 @@ public class RandomServiceImpl implements RandomService {
             case "邮箱":
             case "mail":
             case "email":
-                return jsonUtils.faker.internet().emailAddress(jsonUtils.faker.funnyName().name());
+                return jsonUtils.faker.internet().emailAddress(jsonUtils.faker.funnyName().name())
+                        .replaceAll("\s+", "");
             default:
                 return null;
         }
@@ -415,6 +440,33 @@ public class RandomServiceImpl implements RandomService {
         regexRegisterDo.setRulerType(registerRulerVo.getRulerType());
         regexRegisterDo.setExample(example);
         rulerRegisterMapper.insert(regexRegisterDo);
+    }
+
+
+    @Override
+    public List<String> testRuler(@NotNull BuildRuler buildRuler) throws NormalErrorException {
+        List<String> ans = new ArrayList<>();
+        for (int i = 0; i < buildRuler.getCount(); i++) {
+            ans.add(objectMapper.convertValue(randomByRuler(buildRuler.getRulerType(), buildRuler.getParams()), String.class));
+        }
+        return ans;
+    }
+
+
+    @Override
+    public List<SelectOption> getRuler(@NotNull String actionID) {
+        ArrayList<SelectOption> selectOptions = new ArrayList<>();
+        List<RegexRegisterDo> rulerList = rulerRegisterMapper.selectByMap(Map.of("action_id", actionID));
+        for (RegexRegisterDo regexRegisterDo : rulerList) {
+            String label = String.format("%s|%s|%s", regexRegisterDo.getRulerType(),
+                    StringUtils.substring(regexRegisterDo.getParams(), 0, 40),
+                    regexRegisterDo.getExample());
+
+            selectOptions.add(new SelectOption(label,
+                    regexRegisterDo.getRulerType(),
+                    List.of(regexRegisterDo.getParams().split("\n#"))));
+        }
+        return selectOptions;
     }
 
 }

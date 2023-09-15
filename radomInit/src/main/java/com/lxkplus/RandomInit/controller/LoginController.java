@@ -7,6 +7,7 @@ import com.lxkplus.RandomInit.exception.ThrowUtils;
 import com.lxkplus.RandomInit.mapper.UserMapper;
 import com.lxkplus.RandomInit.model.DO.UserLogin;
 import com.lxkplus.RandomInit.model.VO.UserInfo;
+import com.lxkplus.RandomInit.service.SchemaService;
 import com.lxkplus.RandomInit.utils.MD5Utils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
@@ -26,6 +27,9 @@ import java.util.Map;
 public class LoginController {
 
     final Integer minPassWordLen = 8;
+
+    @Resource
+    SchemaService schemaService;
 
     @Resource
     UserMapper userMapper;
@@ -75,11 +79,14 @@ public class LoginController {
         // 注册session
         httpSession.setAttribute("actionID", userLogins.get(0).getActionID());
 
+        // 给这个用户加一个默认的数据库
+        schemaService.createSchema(userLogins.get(0).getActionID());
+
         return new BodyResponse<>(null, "成功登录");
 
     }
 
-    private void checkVoidBodyResponse(@RequestBody UserInfo userInfo) throws NormalErrorException {
+    private void checkVoidBodyResponse(UserInfo userInfo) throws NormalErrorException {
         ThrowUtils.throwIf(StringUtils.isBlank(userInfo.getUserName()), ErrorEnum.Empty, "用户名为空！");
         ThrowUtils.throwIf(StringUtils.isBlank(userInfo.getPassword()), ErrorEnum.Empty, "密码为空！");
         ThrowUtils.throwIf(userInfo.getUserName().length() > 100, ErrorEnum.paramNotSupport, "用户名过长！");

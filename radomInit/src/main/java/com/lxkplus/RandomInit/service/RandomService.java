@@ -6,6 +6,7 @@ import com.lxkplus.RandomInit.exception.NormalErrorException;
 import com.lxkplus.RandomInit.model.DO.ColumnBuilderInfo;
 import com.lxkplus.RandomInit.model.VO.BuildRuler;
 import com.lxkplus.RandomInit.model.VO.RegisterRulerVo;
+import com.lxkplus.RandomInit.model.VO.SelectOption;
 
 import java.util.List;
 
@@ -49,4 +50,8 @@ public interface RandomService {
     List<String> getDataByRegex(BuildRuler buildRuler) throws NormalErrorException;
 
     void registerRegexRuler(RegisterRulerVo registerRulerVo) throws NormalErrorException;
+
+    List<String> testRuler(BuildRuler buildRuler) throws NormalErrorException;
+
+    List<SelectOption> getRuler(String actionID);
 }

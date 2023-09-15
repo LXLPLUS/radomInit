@@ -4,11 +4,13 @@ import com.lxkplus.RandomInit.commons.BodyResponse;
 import com.lxkplus.RandomInit.exception.NormalErrorException;
 import com.lxkplus.RandomInit.model.VO.BuildRuler;
 import com.lxkplus.RandomInit.model.VO.RegisterRulerVo;
+import com.lxkplus.RandomInit.model.VO.SelectOption;
 import com.lxkplus.RandomInit.service.RandomService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +19,7 @@ import java.util.List;
 
 @RestController
 @Slf4j
-public class RegexController {
+public class RulerController {
 
     @Resource
     RandomService randomService;
@@ -40,6 +42,14 @@ public class RegexController {
 
     @PostMapping("/builderRuler")
     public BodyResponse<List<String>> checkBuilderRuler(@Valid @RequestBody BuildRuler buildRuler) throws NormalErrorException {
-        return new BodyResponse<>(null);
+        List<String> stringList = randomService.testRuler(buildRuler);
+        return new BodyResponse<>(stringList);
+    }
+
+    @GetMapping("/userRuler")
+    public BodyResponse<List<SelectOption>> getRuler() {
+        String actionID = httpSession.getAttribute("actionID").toString();
+        List<SelectOption> ruler = randomService.getRuler(actionID);
+        return new BodyResponse<>(ruler);
     }
 }

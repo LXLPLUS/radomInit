@@ -64,6 +64,27 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(WorkIcon)
   },
   {
+    label: "数据库/表格/行列",
+    key: "database",
+    icon: renderIcon(WorkIcon),
+    children: [
+      {
+        label: () =>
+            h(
+                RouterLink,
+                {
+                  to: {
+                    path: '/tableCreate'
+                  }
+                },
+                { default: () => '新建表格' }
+            ),
+        key: 'tableCreate',
+        icon: renderIcon(WorkIcon)
+      }
+    ]
+  },
+  {
     label: " 数据生成",
     key: "dataBuilder",
     icon: renderIcon(WorkIcon),
@@ -105,7 +126,7 @@ const menuOptions: MenuOption[] = [
                     path: '/builderRuler'
                   }
                 },
-                { default: () => '可用模板' }
+                { default: () => '固定/自定义规则' }
             ),
         key: 'buildRuler',
         icon: renderIcon(WorkIcon)

@@ -70,12 +70,9 @@ public class SchemaServiceImpl implements SchemaService {
         mysqlCheckService.checkDataBaseNameSafe(userSchemaName);
         String nameWithPrefix = getRealSchemaName(actionID, userSchemaName);
 
-        ThrowUtils.throwIf(mysqlCheckService.checkDatabaseExist(actionID, userSchemaName, false),
-                ErrorEnum.Exist,
-                String.format("对应数据库%s存在", nameWithPrefix));
-
+        // 如果不存在则新建
         databaseMapper.createDatabase(nameWithPrefix);
-        log.info("成功新建数据库{}", nameWithPrefix);
+        log.info("成功新建数据库(如果不存在){}", nameWithPrefix);
         return prefix;
     }
 
