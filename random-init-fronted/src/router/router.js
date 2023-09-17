@@ -4,11 +4,24 @@ import Regex from "../components/Regex.vue"
 import Enum from "../components/Enum.vue"
 import BuilderRuler from "../components/BuilderRuler.vue"
 import TableCreate from "../components/TableCreate.vue"
+import {
+    createDiscreteApi
+} from 'naive-ui'
+
+
+
+const { message } = createDiscreteApi(
+    ["message"]
+);
+
 
 const routes = [
     {
         path: "/LoginAndRegister",
-        component: LoginAndRegister
+        component: LoginAndRegister,
+        meta: {
+            mustLogin:false
+        }
     },
     {
         path: "/regex",
@@ -31,6 +44,32 @@ const routes = [
 const router = createRouter({
     history:createWebHashHistory(),
     routes,
+})
+
+router.beforeEach(async (to, from, next) => {
+    // 如果登录首页，自动跳转到登录界面
+    if (to.path === "/") {
+        next("/LoginAndRegister")
+    }
+    // 校验是否是必须登录端口
+    if (to.meta["mustLogin"] === false) {
+        next();
+        return
+    }
+    const response = await fetch("/backend/loginCheck").then(data => data.json()).catch(() => message.warning("网络错误"))
+
+    if (response.data.login === true) {
+        next()
+        return
+    }
+    if (response.data.login === false) {
+        message.warning("未登录！")
+        next("/LoginAndRegister")
+        return
+    }
+
+    next("/LoginAndRegister")
+
 })
 
 export default router

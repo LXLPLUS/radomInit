@@ -1,7 +1,7 @@
 <template>
   <n-image
       width="300"
-      src="./src/images/logo.png"
+      src="./src/static/images/logo.png"
   />
 </template>
 

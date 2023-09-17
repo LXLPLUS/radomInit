@@ -10,11 +10,22 @@
       <n-input placeholder="默认编码" v-model:value="tableHead.charset"></n-input>
     </n-gi>
     <n-gi>
-      <n-input placeholder="字符集" v-model:value="tableHead.shotRuler"></n-input>
+      <n-input placeholder="字符集" v-model:value="tableHead.sortRuler"></n-input>
     </n-gi>
     <n-gi>
       <n-input placeholder="注释" v-model:value="tableHead.comment"></n-input>
     </n-gi>
+    <n-gi>
+      <n-switch v-model:value="tableHead.ifNotExist" size="medium">
+        <template #checked>
+          if Not Exist
+        </template>
+        <template #unchecked>
+          null
+        </template>
+      </n-switch>
+    </n-gi>
+
   </n-grid>
 
   <n-divider/>
@@ -22,7 +33,7 @@
   <n-dynamic-input :on-create="onCreate"
                    v-model:value="columns"
                    :min="1"
-                   :max="100"
+                   :max="200"
                    show-sort-button>
     <template #default="{ value }">
       <n-grid x-gap="12" :cols="12">
@@ -85,28 +96,47 @@
 
   <br/>
   <br/>
-  <n-grid :cols="4">
+  <n-grid :cols="8">
     <n-gi>
     <n-button type="warning" @click="clearData">
       清空
     </n-button>
   </n-gi>
     <n-gi>
-      <n-button type="success" @click="gatherTable">
-        生成
+      <n-button type="success">
+        导入
       </n-button>
     </n-gi>
+    <n-gi>
+      <n-button type="success" @click="gatherTable">
+        从表单生成sql
+      </n-button>
+    </n-gi>
+    <n-gi>
+      <n-button type="success"> 记录 </n-button>
+    </n-gi>
   </n-grid>
+
+  <n-divider/>
+
+  <Code v-model:code="code"></Code>
 
 
 </template>
 
 <script>
 import {defineComponent} from "vue";
+import Code from "./Code.vue";
+import { useMessage } from "naive-ui"
 
 export default defineComponent({
   name: "tableCreate",
-  setup() {
+  components: {Code},
+  setup: function () {
+
+    const message = useMessage()
+
+    const code = ref("")
 
     const extraParams = [
       {
@@ -127,8 +157,9 @@ export default defineComponent({
       tableName: "",
       engine: "InnoDB",
       charset: "utf8mb4",
-      shotRuler: "utf8mb4_0900_ai_ci",
-      comment: ""
+      sortRuler: "utf8mb4_0900_ai_ci",
+      comment: "",
+      ifNotExist: true
     })
 
     let tableIndex = ref(
@@ -141,13 +172,13 @@ export default defineComponent({
         ]
     )
 
-    let nullStyle = ({ focused, checked }) => {
-        const style = {background: "#FF9900"};
-        if (checked) {
-          style.background = "green"
-        }
-        return style
+    let nullStyle = ({_, checked}) => {
+      const style = {background: "#FF9900"};
+      if (checked) {
+        style.background = "green"
       }
+      return style
+    }
 
     let columns = ref(
         [
@@ -210,15 +241,15 @@ export default defineComponent({
     function clearData() {
       columns.value =
           [
-              {
-                rowName: "id",
-                dataType: "int",
-                pri: true,
-                allowNull: false,
-                default: null,
-                extra: "AUTO_INCREMENT",
-                comment: "id"
-              }
+            {
+              rowName: "id",
+              dataType: "int",
+              pri: true,
+              allowNull: false,
+              default: null,
+              extra: "AUTO_INCREMENT",
+              comment: "id"
+            }
           ]
 
       Object.assign(tableHead,
@@ -227,28 +258,40 @@ export default defineComponent({
                 tableName: "",
                 engine: "InnoDB",
                 charset: "utf8mb4",
-                shotRuler: "utf8mb4_0900_ai_ci",
-                comment: ""
+                sortRuler: "utf8mb4_0900_ai_ci",
+                comment: "",
+                ifNotExist: true
               }
           )
       )
 
       tableIndex.value =
-        [
-          {
-            indexName: "pk_id",
-            indexType: "",
-            indexColumns: ["id"]
-          }
-        ]
+          [
+            {
+              indexName: "pk_id",
+              indexType: "",
+              indexColumns: ["id"]
+            }
+          ]
     }
 
     function onCreate() {
       return Object.assign({}, defaultColumn)
     }
 
-    function gatherTable() {
-      console.log(columns)
+    async function gatherTable() {
+      const config = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({"tableHeader": tableHead, "tableColumns": columns.value, "tableIndices": tableIndex.value})
+      }
+
+      const response = await fetch("/backend/gatherSql", config)
+          .then(data => data.json())
+
+      code.value = response.data["sql"]
     }
 
     return {
@@ -261,7 +304,8 @@ export default defineComponent({
       tableIndex,
       clearData,
       extraParams,
-      nullStyle
+      nullStyle,
+      code
     }
   }
 })

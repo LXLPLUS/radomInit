@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -83,7 +84,6 @@ public class LoginController {
         schemaService.createSchema(userLogins.get(0).getActionID());
 
         return new BodyResponse<>(null, "成功登录");
-
     }
 
     private void checkVoidBodyResponse(UserInfo userInfo) throws NormalErrorException {
@@ -93,4 +93,15 @@ public class LoginController {
         ThrowUtils.throwIf(userInfo.getPassword().length() > 100, ErrorEnum.paramNotSupport, "密码过长！");
         ThrowUtils.throwIf(userInfo.getPassword().length() < minPassWordLen, ErrorEnum.Empty, "密码小于" + minPassWordLen + "位数！");
     }
+
+
+    @GetMapping("/loginCheck")
+    public BodyResponse<Map<String, Boolean>> checkLogin() {
+        if (httpSession.getAttribute("actionID") == null) {
+            return new BodyResponse<>(Map.of("login", false));
+        }
+        return new BodyResponse<>(Map.of("login", true));
+    }
+
+
 }
