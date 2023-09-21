@@ -43,6 +43,7 @@
 import { defineComponent, ref} from 'vue'
 import LoginHeader from "./LoginHeader.vue";
 import loginHook from "../hooks/loginHook.js"
+import { useRouter } from "vue-router";
 
 
 export default defineComponent( {
@@ -51,6 +52,8 @@ export default defineComponent( {
     LoginHeader
   },
   setup() {
+
+    const router = useRouter()
 
     const loginFunc = loginHook()
 
@@ -95,6 +98,7 @@ export default defineComponent( {
         return
       }
       loginFunc.message.success("欢迎 " + modelRef.value.userName)
+      await router.push("/tableCreate");
     }
 
     return {

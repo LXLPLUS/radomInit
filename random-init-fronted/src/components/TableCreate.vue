@@ -1,31 +1,37 @@
 <template>
-  <n-grid x-gap="12" :cols="7">
-    <n-gi>
-      <n-input placeholder="表名" v-model:value="tableHead.tableName"></n-input>
+  <n-grid x-gap="12" :cols="15">
+    <n-gi  :span="2">
+      <n-input placeholder="表名"
+               v-model:value="tableHead.tableName"
+      />
     </n-gi>
-    <n-gi>
-      <n-input placeholder="引擎" v-model:value="tableHead.engine"></n-input>
+    <n-gi :span="2">
+      <n-select placeholder="引擎"
+                v-model:value="tableHead.engine"
+                tag
+                filterable
+                :options="engineParams"
+      />
     </n-gi>
-    <n-gi>
-      <n-input placeholder="默认编码" v-model:value="tableHead.charset"></n-input>
+    <n-gi  :span="2">
+      <n-select placeholder="默认编码" v-model:value="tableHead.charset" :options="charSetParams" label-field="value" value-field="value"/>
     </n-gi>
-    <n-gi>
-      <n-input placeholder="字符集" v-model:value="tableHead.sortRuler"></n-input>
+    <n-gi  :span="3">
+      <n-select placeholder="字符集" v-model:value="tableHead.sortRuler" :options="collationParams" style="font-size: 50%"/>
     </n-gi>
-    <n-gi>
-      <n-input placeholder="注释" v-model:value="tableHead.comment"></n-input>
+    <n-gi  :span="2">
+      <n-input placeholder="注释" v-model:value="tableHead.comment"/>
     </n-gi>
-    <n-gi>
+    <n-gi  :span="2">
       <n-switch v-model:value="tableHead.ifNotExist" size="medium">
         <template #checked>
           if Not Exist
         </template>
         <template #unchecked>
-          null
+          默认
         </template>
       </n-switch>
     </n-gi>
-
   </n-grid>
 
   <n-divider/>
@@ -36,43 +42,8 @@
                    :max="200"
                    show-sort-button>
     <template #default="{ value }">
-      <n-grid x-gap="12" :cols="12">
-        <n-gi :span="2">
-          <n-input placeholder="字段名" v-model:value="value.rowName"></n-input>
-        </n-gi>
-        <n-gi :span="2">
-          <n-mention placeholder="类型" v-model:value="value.dataType"></n-mention>
-        </n-gi>
-        <n-gi>
-          <n-switch v-model:value="value.pri" size="small">
-            <template #checked>
-              主键
-            </template>
-            <template #unchecked>
-              非主键
-            </template>
-          </n-switch>
-        </n-gi>
-        <n-gi>
-          <n-switch v-model:value="value.allowNull" size="small" :rail-style="nullStyle">
-            <template #checked>
-              允许null
-            </template>
-            <template #unchecked>
-              非null
-            </template>
-          </n-switch>
-        </n-gi>
-        <n-gi :span="2">
-          <n-input placeholder="默认值" v-model:value="value.default"></n-input>
-        </n-gi>
-        <n-gi :span="2">
-          <n-select placeholder="额外信息" v-model:value="value.extra" :options="extraParams"></n-select>
-        </n-gi>
-        <n-gi :span="2">
-          <n-input placeholder="注释" v-model:value="value.comment"></n-input>
-        </n-gi>
-      </n-grid>
+      <MysqlTypeSelect :value="value"
+                       @changeIndex="changeIndex"/>
     </template>
   </n-dynamic-input>
 
@@ -82,13 +53,16 @@
     <template #default="{ value }">
       <n-grid x-gap="12" :cols="6">
         <n-gi>
-          <n-input v-model:value="value.indexName" placeholder="索引名称"></n-input>
+          <n-input v-model:value="value.indexName" placeholder="索引名称"/>
         </n-gi>
         <n-gi>
-          <n-select v-model:value="value.indexType" placeholder="索引类型"></n-select>
+          <n-select v-model:value="value.indexType"
+                    placeholder="索引类型"
+                    :options="indexParams"
+          />
         </n-gi>
-        <n-gi>
-          <n-select multiple v-model:value="value.indexColumns"></n-select>
+        <n-gi :span="2">
+          <n-select multiple v-model:value="value.indexColumns" :options="columnsLabel"/>
         </n-gi>
       </n-grid>
     </template>
@@ -103,8 +77,8 @@
     </n-button>
   </n-gi>
     <n-gi>
-      <n-button type="success">
-        导入
+      <n-button type="success" @click="inputSQL">
+        文本导入
       </n-button>
     </n-gi>
     <n-gi>
@@ -121,6 +95,11 @@
 
   <Code v-model:code="code"></Code>
 
+  <InputSQL v-model:inputSQLParams="inputSQLParams"
+            v-model:createSql="createSql"
+            @gather="gather"
+  />
+
 
 </template>
 
@@ -128,30 +107,29 @@
 import {defineComponent} from "vue";
 import Code from "./Code.vue";
 import { useMessage } from "naive-ui"
+import MysqlTypeSelect from "./MysqlTypeSelect.vue";
+import InputSQL from "./InputSQL.vue";
+import mysqlParams from "../hooks/mysqlParams";
 
 export default defineComponent({
   name: "tableCreate",
-  components: {Code},
+  components: {InputSQL, MysqlTypeSelect, Code},
   setup: function () {
+
+    const code = ref("")
+    const inputSQLParams = reactive({
+      "condition": false
+    })
 
     const message = useMessage()
 
-    const code = ref("")
-
-    const extraParams = [
-      {
-        label: "",
-        value: ""
-      },
-      {
-        label: "AUTO_INCREMENT",
-        value: "AUTO_INCREMENT"
-      },
-      {
-        label: "ON UPDATE CURRENT_TIMESTAMP",
-        value: "ON UPDATE CURRENT_TIMESTAMP"
-      }
-    ]
+    let charSetParams = mysqlParams().charSetParams
+    const indexParams = mysqlParams().indexParams
+    const engineParams = mysqlParams().engineParams
+    const collationParams = mysqlParams().collationParams
+    const createSql = reactive({
+      data: ""
+    })
 
     let tableHead = reactive({
       tableName: "",
@@ -166,67 +144,73 @@ export default defineComponent({
         [
           {
             indexName: "pk_id",
-            indexType: "",
-            indexColumns: ["id"]
+            indexType: "PRIMARY KEY",
+            indexColumns: ["id asc"]
           }
         ]
     )
-
-    let nullStyle = ({_, checked}) => {
-      const style = {background: "#FF9900"};
-      if (checked) {
-        style.background = "green"
-      }
-      return style
-    }
 
     let columns = ref(
         [
           {
             rowName: "id",
-            dataType: "int",
+            dataType: "INT",
             pri: true,
+            param1: 10,
             allowNull: false,
-            default: null,
+            defaultMessage: null,
             extra: "AUTO_INCREMENT",
             comment: "id"
           },
           {
             rowName: "createTime",
-            dataType: "datetime",
+            dataType: "DATETIME",
             pri: false,
             allowNull: false,
-            default: null,
+            defaultMessage: null,
             extra: null,
             comment: null
           },
           {
             rowName: "updateTime",
-            dataType: "datetime",
+            dataType: "DATETIME",
             pri: false,
             allowNull: false,
-            default: null,
+            defaultMessage: null,
             extra: null,
             comment: null
           },
           {
             rowName: "isDelete",
-            dataType: "datetime",
+            dataType: "BOOLEAN",
             pri: false,
             allowNull: false,
-            default: "false",
+            defaultMessage: "0",
             extra: null,
             comment: null
           }
         ]
     )
 
+    let columnsLabel = computed(() => {
+      const columnsList = []
+        for (const column of columns.value) {
+          columnsList.push({"label": column.rowName + "(正序)", "value": column.rowName + " asc"})
+        }
+        for (const column of columns.value) {
+          columnsList.push({"label": column.rowName + "(倒序)", "value": column.rowName + " desc"})
+        }
+        return columnsList
+      }
+    )
+
     const defaultColumn = reactive({
       rowName: "",
-      dataType: "int",
+      dataType: "VARCHAR",
+      param1: 255,
       pri: false,
-      allowNull: true,
-      default: null,
+      allowNull: false,
+      defaultMessage: null,
       extra: null,
       comment: null
     })
@@ -234,6 +218,7 @@ export default defineComponent({
     function onCreateIndex() {
       return {
         indexName: "",
+        indexType: "KEY",
         indexColumns: []
       }
     }
@@ -243,10 +228,10 @@ export default defineComponent({
           [
             {
               rowName: "id",
-              dataType: "int",
+              dataType: "INT",
               pri: true,
               allowNull: false,
-              default: null,
+              defaultMessage: null,
               extra: "AUTO_INCREMENT",
               comment: "id"
             }
@@ -269,14 +254,19 @@ export default defineComponent({
           [
             {
               indexName: "pk_id",
-              indexType: "",
-              indexColumns: ["id"]
+              indexType: "PRIMARY KEY",
+              indexColumns: ["id asc"]
             }
           ]
+      code.value = ""
     }
 
     function onCreate() {
       return Object.assign({}, defaultColumn)
+    }
+
+    function inputSQL() {
+      inputSQLParams.condition = true
     }
 
     async function gatherTable() {
@@ -294,6 +284,51 @@ export default defineComponent({
       code.value = response.data["sql"]
     }
 
+    async function gather() {
+
+      const config = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({"sql": createSql.data})
+      }
+      const response = await fetch("/backend/explainSql", config).then(data => data.json())
+
+      if (response["errorCode"] !== 0) {
+        message.warning(response["errorMessage"])
+      }
+      else {
+        Object.assign(tableHead, response.data.tableHeader)
+        columns.value = response.data.tableColumns
+        indexParams.value = response.data.tableIndices
+      }
+
+      inputSQLParams.condition = false
+      await gatherTable()
+    }
+
+    function changeIndex(value) {
+      for (const column of columns.value) {
+        if (column !== value) {
+          column.pri = false
+        }
+      }
+
+      tableIndex.value = tableIndex.value.filter(function (item) {
+        return item.indexType !== "PRIMARY KEY"
+      })
+
+      if (value.pri === true) {
+        tableIndex.value.unshift({
+              indexName: "pk_" + value.rowName,
+              indexType: "PRIMARY KEY",
+              indexColumns: [value.rowName + " asc"]
+            }
+        )
+      }
+    }
+
     return {
       onCreate,
       columns,
@@ -303,9 +338,17 @@ export default defineComponent({
       onCreateIndex,
       tableIndex,
       clearData,
-      extraParams,
-      nullStyle,
-      code
+      code,
+      indexParams,
+      columnsLabel,
+      inputSQLParams,
+      inputSQL,
+      engineParams,
+      charSetParams,
+      collationParams,
+      gather,
+      createSql,
+      changeIndex
     }
   }
 })

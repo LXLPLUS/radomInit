@@ -26,7 +26,7 @@
             :collapsed-width="64"
             :collapsed-icon-size="22"/>
     </n-layout-sider>
-    <n-layout-content style="margin-left: 50px">
+    <n-layout-content style="margin-left: 50px; font-size: 80%">
       <router-view/>
     </n-layout-content>
   </n-layout>

@@ -32,6 +32,8 @@ public class TableParams {
         String defaultMessage;
         String extra;
         String comment;
+        Integer param1;
+        Integer param2;
 
         public String getDefault() {
             return defaultMessage;
@@ -47,7 +49,7 @@ public class TableParams {
         @NotNull(message = "表头不能为空")
         String tableName;
         String engine;
-        String charSet;
+        String charset;
         String sortRuler;
         String comment;
         boolean ifNotExist;

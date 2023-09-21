@@ -40,6 +40,7 @@ public class GlobalExceptionHandler {
     public ErrorBodyResponse ExceptionHandler(Exception e) {
         log.warn("出现错误，错误原因为 {}", e.getMessage());
         if (debugMode) {
+            e.printStackTrace();
             return new ErrorBodyResponse(-1, e.getMessage());
         }
         return new ErrorBodyResponse(-1, "内部错误");

@@ -8,6 +8,8 @@ public interface TableService {
 
     MySqlCreateTableStatement convertVoToStatement(TableParams tableParams);
 
+    TableParams convertStatementToVo(String sql) throws NormalErrorException;
+
     void createTable(String actionID, String databaseName, String sql) throws NormalErrorException;
 
     int clearData(String actionID, String databaseName, String tableName) throws NormalErrorException;
