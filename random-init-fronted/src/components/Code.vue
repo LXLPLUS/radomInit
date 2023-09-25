@@ -3,8 +3,8 @@
     复制到剪贴板
   </n-button>
   <br>
-  <n-card style="min-height: 800px" :embedded="true">
-    <n-code v-model:code="this.props.code" language="javascript" show-line-numbers/>
+  <n-card style="min-height: 60vh; min-width: 90% " :embedded="true">
+    <n-code v-model:code="this.props.code" language="java" show-line-numbers/>
   </n-card>
 </template>
 
@@ -22,7 +22,6 @@ export default {
     const { toClipboard } = clipboard3();
 
     async function copy() {
-      console.log(props.code)
       try {
         await toClipboard(props.code)
         message.info("复制成功")

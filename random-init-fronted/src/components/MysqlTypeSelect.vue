@@ -1,7 +1,9 @@
 <template>
   <n-grid :cols="24" :x-gap="4" :y-gap="4">
     <n-gi :span="3">
-      <n-input placeholder="字段名" v-model:value="value.rowName"></n-input>
+      <n-input placeholder="字段名"
+               v-model:value="value.rowName"
+               :status="rowNameStatus"></n-input>
     </n-gi>
     <n-gi :span="3">
       <n-select placeholder="类型"
@@ -69,7 +71,14 @@ export default {
 
     let conditions = reactive({
       param1disabled : true,
-      param2disabled : true
+      param2disabled : true,
+    })
+
+    const rowNameStatus = computed(() => {
+      if (props.value.rowName.length === 0) {
+        return "error"
+      }
+      return "success"
     })
 
     onBeforeMount(() => {
@@ -146,7 +155,8 @@ export default {
       props,
       nullStyle,
       extraParams,
-      clearPri
+      clearPri,
+      rowNameStatus
     }
   }
 }

@@ -5,6 +5,7 @@ import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlInsertStatement;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.javafaker.Faker;
 import com.lxkplus.RandomInit.commons.CacheBuffer;
 import com.lxkplus.RandomInit.enums.ErrorEnum;
 import com.lxkplus.RandomInit.enums.MysqlEnum;
@@ -22,7 +23,6 @@ import com.lxkplus.RandomInit.model.VO.SelectOption;
 import com.lxkplus.RandomInit.service.MysqlCheckService;
 import com.lxkplus.RandomInit.service.RandomService;
 import com.lxkplus.RandomInit.service.SchemaService;
-import com.lxkplus.RandomInit.utils.JsonUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -40,13 +40,13 @@ import java.util.stream.Collectors;
 public class RandomServiceImpl implements RandomService {
 
     @Resource
-    JsonUtils jsonUtils;
-
-    @Resource
     ObjectMapper objectMapper;
 
     @Resource
     SchemaService schemaService;
+    
+    @Resource
+    Faker faker;
 
     @Resource
     MysqlCheckService mysqlCheckService;
@@ -196,7 +196,7 @@ public class RandomServiceImpl implements RandomService {
             case "正则表达式":
             case "regex":
                 ThrowUtils.throwIf(params.isEmpty(), ErrorEnum.NotEnoughParams, "缺乏正则表达式参数");
-                return jsonUtils.faker.regexify(params.get(0));
+                return faker.regexify(params.get(0));
             case "long":
             case "int":
             case "integer":
@@ -204,16 +204,16 @@ public class RandomServiceImpl implements RandomService {
             case "range":
             case "范围":
                 if (params.isEmpty()) {
-                    return jsonUtils.faker.number().numberBetween(0, Integer.MAX_VALUE / 10);
+                    return faker.number().numberBetween(0, Integer.MAX_VALUE / 10);
                 }
                 else if (params.size() == 1) {
-                    return jsonUtils.faker.number().numberBetween(Long.parseLong(params.get(0)), Integer.MAX_VALUE / 2);
+                    return faker.number().numberBetween(Long.parseLong(params.get(0)), Integer.MAX_VALUE / 2);
                 }
-                return jsonUtils.faker.number().numberBetween(Long.parseLong(params.get(0)), Long.parseLong(params.get(1)));
+                return faker.number().numberBetween(Long.parseLong(params.get(0)), Long.parseLong(params.get(1)));
             case "range|param1":
-                return jsonUtils.faker.number().numberBetween(Long.parseLong(params.get(0)), Integer.MAX_VALUE / 2);
+                return faker.number().numberBetween(Long.parseLong(params.get(0)), Integer.MAX_VALUE / 2);
             case "range|param1|param2":
-                return jsonUtils.faker.number().numberBetween(Long.parseLong(params.get(0)), Long.parseLong(params.get(1)));
+                return faker.number().numberBetween(Long.parseLong(params.get(0)), Long.parseLong(params.get(1)));
             case "时间":
             case "time":
                 Date startTime = DateUtils.addDays(new Date(), -100);
@@ -228,7 +228,7 @@ public class RandomServiceImpl implements RandomService {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                return jsonUtils.faker.date().between(startTime, endTime);
+                return faker.date().between(startTime, endTime);
 
             case "time|param1":
                 startTime = DateUtils.addDays(new Date(), -100);
@@ -238,36 +238,36 @@ public class RandomServiceImpl implements RandomService {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                return jsonUtils.faker.date().between(startTime, endTime);
+                return faker.date().between(startTime, endTime);
             case "正数":
-                return jsonUtils.faker.number().numberBetween(1, Integer.MAX_VALUE / 10);
+                return faker.number().numberBetween(1, Integer.MAX_VALUE / 10);
             case "手机号":
-                return jsonUtils.faker.regexify("1[0-9]{10}");
+                return faker.regexify("1[0-9]{10}");
             case "ip":
             case "ipv4":
-                return jsonUtils.faker.internet().ipV4Address();
+                return faker.internet().ipV4Address();
             case "uuid":
-                return jsonUtils.faker.internet().uuid();
+                return faker.internet().uuid();
             case "url":
-                return jsonUtils.faker.internet().url();
+                return faker.internet().url();
             case "名字":
             case "name":
-                return jsonUtils.faker.name().name();
+                return faker.name().name();
             case "default":
             case "默认值":
             case "枚举":
             case "enum":
                 ThrowUtils.throwIf(params.isEmpty(), ErrorEnum.NotEnoughParams, "缺乏默认值");
-                int index = jsonUtils.faker.number().numberBetween(0, params.size());
+                int index = faker.number().numberBetween(0, params.size());
                 return params.get(index);
             case "金钱":
             case "钱":
             case "money":
-                return jsonUtils.faker.number().randomDouble(2, 0, 1000000);
+                return faker.number().randomDouble(2, 0, 1000000);
             case "邮箱":
             case "mail":
             case "email":
-                return jsonUtils.faker.internet().emailAddress(jsonUtils.faker.funnyName().name())
+                return faker.internet().emailAddress(faker.funnyName().name())
                         .replaceAll("\s+", "");
             default:
                 return null;
@@ -335,14 +335,14 @@ public class RandomServiceImpl implements RandomService {
         List<SQLExpr> arguments = sqlColumnDefinition.getDataType().getArguments();
         switch (mysqlEnum) {
             case INT:
-                return jsonUtils.faker.number().numberBetween(0, Integer.MAX_VALUE / 10);
+                return faker.number().numberBetween(0, Integer.MAX_VALUE / 10);
             case BIGINT:
             case LONG:
-                return jsonUtils.faker.number().numberBetween(0, Long.MAX_VALUE / 10);
+                return faker.number().numberBetween(0, Long.MAX_VALUE / 10);
             case DOUBLE:
-                return jsonUtils.faker.number().randomDouble(3, 0, Long.MAX_VALUE / 100);
+                return faker.number().randomDouble(3, 0, Long.MAX_VALUE / 100);
             case FLOAT:
-                return jsonUtils.faker.number().randomDouble(3, 0, Integer.MAX_VALUE / 2);
+                return faker.number().randomDouble(3, 0, Integer.MAX_VALUE / 2);
             case VARCHAR:
                 int sqlExpr = ((SQLIntegerExpr) arguments.get(0)).getNumber().intValue() - 10;
                 sqlExpr = Math.max(sqlExpr, 2);
@@ -363,12 +363,12 @@ public class RandomServiceImpl implements RandomService {
             case DECIMAL:
                 int sqlExpr1 = ((SQLIntegerExpr) arguments.get(0)).getNumber().intValue();
                 int sqlExpr2 = ((SQLIntegerExpr) arguments.get(1)).getNumber().intValue();
-                return jsonUtils.faker.number().randomDouble(sqlExpr2,
+                return faker.number().randomDouble(sqlExpr2,
                         0,
                         (long) Math.pow(10, sqlExpr1 - sqlExpr2) - 1);
             case TINYINT:
             case BOOL:
-                return jsonUtils.faker.number().numberBetween(0, 2);
+                return faker.number().numberBetween(0, 2);
             default:
                 throw new NormalErrorException(ErrorEnum.paramNotSupport, String.format("%s这个参数不支持",
                         sqlColumnDefinition.getDataType().getName().toUpperCase()));
@@ -401,13 +401,13 @@ public class RandomServiceImpl implements RandomService {
     public List<String> getDataByRegex(BuildRuler buildRuler) throws NormalErrorException {
         ThrowUtils.throwIfNullOrEmpty(buildRuler.getParams(), "缺乏必要参数");
         try {
-            jsonUtils.faker.regexify(buildRuler.getParams().get(0));
+            faker.regexify(buildRuler.getParams().get(0));
         } catch (Exception e) {
             throw new NormalErrorException(ErrorEnum.NotExist, "正则表达式不支持！");
         }
         List<String> ans = new ArrayList<>();
         for (int i = 0; i < buildRuler.getCount(); i++) {
-            ans.add(jsonUtils.faker.regexify(buildRuler.getParams().get(0)));
+            ans.add(faker.regexify(buildRuler.getParams().get(0)));
             if (ans.get(i).length() > 1e5) {
                 throw new NormalErrorException(ErrorEnum.LengthTooLong);
             }

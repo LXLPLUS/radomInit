@@ -115,11 +115,11 @@ public final class StringOptional {
         return this;
     }
 
-    public StringOptional replaceAll(String regex, String statement) {
+    public StringOptional replaceAll(String regex, String replacement) {
         if (object == null) {
             return this;
         }
-        object = object.replaceAll(regex, statement);
+        object = object.replaceAll(regex, replacement);
         return this;
     }
 

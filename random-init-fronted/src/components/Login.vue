@@ -86,9 +86,9 @@ export default defineComponent( {
       }
 
       const response = await fetch("/backend/login", config)
-          .then(data => data.json()).catch(() => null)
+          .then(data => data.json()).catch((e) => console.log(e))
 
-      if (response === null) {
+      if (response === null || response === void 0) {
         loginFunc.message.error("后端响应失败！")
         return
       }

@@ -14,6 +14,7 @@ import com.alibaba.druid.sql.dialect.mysql.ast.MySqlKey;
 import com.alibaba.druid.sql.dialect.mysql.ast.MySqlPrimaryKey;
 import com.alibaba.druid.sql.dialect.mysql.ast.MySqlUnique;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStatement;
+import com.github.javafaker.Faker;
 import com.lxkplus.RandomInit.commons.StringOptional;
 import com.lxkplus.RandomInit.enums.ErrorEnum;
 import com.lxkplus.RandomInit.enums.MysqlEnum;
@@ -25,7 +26,6 @@ import com.lxkplus.RandomInit.service.MysqlCheckService;
 import com.lxkplus.RandomInit.service.SchemaService;
 import com.lxkplus.RandomInit.service.StatementService;
 import com.lxkplus.RandomInit.service.TableService;
-import com.lxkplus.RandomInit.utils.JsonUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +44,7 @@ public class TableServiceImpl implements TableService {
     StatementService sqlService;
 
     @Resource
-    JsonUtils jsonUtils;
+    Faker faker;
 
     @Resource
     TableActionMapper tableMapper;
@@ -59,7 +59,8 @@ public class TableServiceImpl implements TableService {
 
         StringOptional.of(tableParams.getTableHeader().getTableName())
                 .trimToEmpty()
-                .emptyMap(x -> jsonUtils.faker.pokemon().name())
+                .emptyMap(x -> faker.pokemon().name())
+                .replaceAll("[^a-zA-Z0-9]", "")
                 .lowerCamelToLowerUnderscore()
                 .addFix("`")
                 .ifNotEmpty(statement::setName);
@@ -77,13 +78,14 @@ public class TableServiceImpl implements TableService {
 
 
         StringOptional.of(tableParams.getTableHeader().getComment())
-                .ifNotBlank(comment -> statement.getTableOptions().add(new SQLAssignItem(new SQLIdentifierExpr("COMMENT"), new SQLIdentifierExpr(comment))));
+                .ifNotBlank(comment -> statement.getTableOptions().add(new SQLAssignItem(new SQLIdentifierExpr("COMMENT"), new SQLIdentifierExpr("'" + comment + "'"))));
 
         statement.setIfNotExiists(tableParams.getTableHeader().isIfNotExist());
 
         // 填入行信息
         for (TableParams.TableColumn tableColumn : tableParams.getTableColumns()) {
             SQLColumnDefinition sqlColumnDefinition = new SQLColumnDefinition();
+            statement.addColumn(sqlColumnDefinition);
 
             StringOptional.of(tableColumn.getRowName())
                     .lowerCamelToLowerUnderscore()
@@ -129,9 +131,9 @@ public class TableServiceImpl implements TableService {
                 sqlColumnDefinition.setDefaultExpr(new SQLCharExpr(tableColumn.getDefault()));
             }
 
-            sqlColumnDefinition.setComment(tableColumn.getComment());
-
-            statement.addColumn(sqlColumnDefinition);
+            if (StringUtils.isNotBlank(tableColumn.getComment())) {
+                sqlColumnDefinition.setComment(tableColumn.getComment());
+            }
         }
 
         for (TableParams.TableIndex tableIndex : tableParams.getTableIndices()) {
