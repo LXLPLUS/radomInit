@@ -19,10 +19,10 @@ public class Timer {
 
     public long getSpendMillis() throws NormalErrorException {
         if (list[0] == 0) {
-            throw new NormalErrorException(ErrorEnum.NotHaveStartTime);
+            throw new NormalErrorException(ErrorEnum.NOT_HAVE_FINISH_TIME);
         }
         if (list[1] == 0) {
-            throw new NormalErrorException(ErrorEnum.NotHaveFinishTime);
+            throw new NormalErrorException(ErrorEnum.NOT_HAVE_FINISH_TIME);
         }
         return list[1] - list[0];
     }

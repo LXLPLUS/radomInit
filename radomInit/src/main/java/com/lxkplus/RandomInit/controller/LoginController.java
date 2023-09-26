@@ -27,7 +27,7 @@ import java.util.Map;
 @Slf4j
 public class LoginController {
 
-    final Integer minPassWordLen = 8;
+    static final int MIN_PASS_WORD_LEN = 8;
 
     @Resource
     SchemaService schemaService;
@@ -55,7 +55,7 @@ public class LoginController {
 
         int userCount = userMapper.selectByMap(Map.of("user_name", userLogin.getUserName())).size();
         if (userCount > 0) {
-            throw new NormalErrorException(ErrorEnum.paramNotSupport, "对应用户存在或者密码错误！");
+            throw new NormalErrorException(ErrorEnum.PARAM_NOT_SUPPORT, "对应用户存在或者密码错误！");
         }
         userMapper.insert(userLogin);
 
@@ -74,7 +74,7 @@ public class LoginController {
 
         // 如果没有用户信息，则抛出异常
         if (userLogins.isEmpty()) {
-            throw new NormalErrorException(ErrorEnum.passWordError);
+            throw new NormalErrorException(ErrorEnum.PASS_WORD_ERROR);
         }
 
         // 注册session
@@ -87,11 +87,11 @@ public class LoginController {
     }
 
     private void checkVoidBodyResponse(UserInfo userInfo) throws NormalErrorException {
-        ThrowUtils.throwIf(StringUtils.isBlank(userInfo.getUserName()), ErrorEnum.Empty, "用户名为空！");
-        ThrowUtils.throwIf(StringUtils.isBlank(userInfo.getPassword()), ErrorEnum.Empty, "密码为空！");
-        ThrowUtils.throwIf(userInfo.getUserName().length() > 100, ErrorEnum.paramNotSupport, "用户名过长！");
-        ThrowUtils.throwIf(userInfo.getPassword().length() > 100, ErrorEnum.paramNotSupport, "密码过长！");
-        ThrowUtils.throwIf(userInfo.getPassword().length() < minPassWordLen, ErrorEnum.Empty, "密码小于" + minPassWordLen + "位数！");
+        ThrowUtils.throwIf(StringUtils.isBlank(userInfo.getUserName()), ErrorEnum.EMPTY, "用户名为空！");
+        ThrowUtils.throwIf(StringUtils.isBlank(userInfo.getPassword()), ErrorEnum.EMPTY, "密码为空！");
+        ThrowUtils.throwIf(userInfo.getUserName().length() > 100, ErrorEnum.PARAM_NOT_SUPPORT, "用户名过长！");
+        ThrowUtils.throwIf(userInfo.getPassword().length() > 100, ErrorEnum.PARAM_NOT_SUPPORT, "密码过长！");
+        ThrowUtils.throwIf(userInfo.getPassword().length() < MIN_PASS_WORD_LEN, ErrorEnum.EMPTY, "密码小于" + MIN_PASS_WORD_LEN + "位数！");
     }
 
 

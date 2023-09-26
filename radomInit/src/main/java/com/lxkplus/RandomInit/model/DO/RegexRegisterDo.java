@@ -20,7 +20,7 @@ public class RegexRegisterDo {
     理论上来说，是应该多表join的，但是我定的是规则不可改变
     既然规则不可改变，那么就没有新增的必要
      */
-    String Params;
+    String params;
     String example;
     Date insertTime;
 }

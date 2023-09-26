@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -52,9 +51,9 @@ public class DataServiceImpl implements DataService {
     public void fillRandomData(String actionID, String userSchemaName, String tableName, int count) throws NormalErrorException {
 
         ThrowUtils.throwIf(!mysqlCheckService.checkTableExist(actionID, userSchemaName, tableName, false),
-                ErrorEnum.Empty,
+                ErrorEnum.EMPTY,
                 "对应的数据库表不存在");
-        ThrowUtils.throwIf(count <= 0, ErrorEnum.paramNotSupport, "数据规模为非正数");
+        ThrowUtils.throwIf(count <= 0, ErrorEnum.PARAM_NOT_SUPPORT, "数据规模为非正数");
 
         String realSchemaName = schemaService.getRealSchemaName(actionID, userSchemaName);
 
@@ -126,7 +125,7 @@ public class DataServiceImpl implements DataService {
             // 获取建表语句的列名
             List<String> collect = statement.getColumnDefinitions().stream()
                     .map(x -> x.getName().getSimpleName())
-                    .collect(Collectors.toList());
+                    .toList();
             // 将字段替换掉
             for (String sqlName : collect) {
                 SQLSelectItem sqlSelectItem = new SQLSelectItem(new SQLIdentifierExpr(sqlName));

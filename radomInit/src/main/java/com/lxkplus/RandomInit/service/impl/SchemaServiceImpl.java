@@ -6,8 +6,8 @@ import com.lxkplus.RandomInit.exception.NormalErrorException;
 import com.lxkplus.RandomInit.exception.ThrowUtils;
 import com.lxkplus.RandomInit.mapper.ColumnBuilderInfoMapper;
 import com.lxkplus.RandomInit.mapper.DatabaseMapper;
-import com.lxkplus.RandomInit.service.SchemaService;
 import com.lxkplus.RandomInit.service.MysqlCheckService;
+import com.lxkplus.RandomInit.service.SchemaService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,14 +17,13 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class SchemaServiceImpl implements SchemaService {
 
-    static final String prefix = "randomInit_temp_".toLowerCase();
-    static final String defaultDatabaseName = "default";
+    static final String PREFIX = "randomInit_temp_".toLowerCase();
+    static final String DEFAULT_DATABASE_NAME = "default";
 
     @Resource
     MysqlCheckService mysqlCheckService;
@@ -37,31 +36,31 @@ public class SchemaServiceImpl implements SchemaService {
 
     @Override
     public String getRealSchemaName(String actionID, String userSchemaName) {
-        return prefix + actionID + "_" + userSchemaName;
+        return PREFIX + actionID + "_" + userSchemaName;
     }
 
     @Override
     public Pair<String, String> getFromRealSchemaName(String realSchemaName) throws NormalErrorException {
-        ThrowUtils.throwIf(!realSchemaName.startsWith(prefix),
-                ErrorEnum.paramNotSupport,
-                "对这个数据库操作是危险的！不是" + prefix);
-        realSchemaName = realSchemaName.replaceFirst(prefix, "");
+        ThrowUtils.throwIf(!realSchemaName.startsWith(PREFIX),
+                ErrorEnum.PARAM_NOT_SUPPORT,
+                "对这个数据库操作是危险的！不是" + PREFIX);
+        realSchemaName = realSchemaName.replaceFirst(PREFIX, "");
         String[] dataList = realSchemaName.split("_", 2);
 
-        ThrowUtils.throwIf(dataList.length < 2, ErrorEnum.NotEnoughParams, realSchemaName + "不是有效的数据库名！");
+        ThrowUtils.throwIf(dataList.length < 2, ErrorEnum.NOT_ENOUGH_PARAMS, realSchemaName + "不是有效的数据库名！");
         return Pair.of(dataList[0], dataList[1]);
     }
 
     private List<String> getAllSchemaRealName() {
         List<String> existDatabase = databaseMapper.getExistDatabase();
-        return existDatabase.stream().filter(x -> x.startsWith(prefix)).collect(Collectors.toList());
+        return existDatabase.stream().filter(x -> x.startsWith(PREFIX)).toList();
     }
 
     private List<String> getSchemaNameByID(String actionId) throws NormalErrorException {
         mysqlCheckService.checkActionIDSafe(actionId);
         return getAllSchemaRealName().stream()
-                .filter(x -> x.startsWith(prefix + actionId + "_"))
-                .collect(Collectors.toList());
+                .filter(x -> x.startsWith(PREFIX + actionId + "_"))
+                .toList();
     }
 
     @Override
@@ -73,13 +72,13 @@ public class SchemaServiceImpl implements SchemaService {
         // 如果不存在则新建
         databaseMapper.createDatabase(nameWithPrefix);
         log.info("成功新建数据库(如果不存在){}", nameWithPrefix);
-        return prefix;
+        return PREFIX;
     }
 
     @Override
     public String createSchema(String actionID) throws NormalErrorException {
         mysqlCheckService.checkTableNameSafe(actionID);
-        return createSchema(actionID, defaultDatabaseName);
+        return createSchema(actionID, DEFAULT_DATABASE_NAME);
     }
 
     @Override

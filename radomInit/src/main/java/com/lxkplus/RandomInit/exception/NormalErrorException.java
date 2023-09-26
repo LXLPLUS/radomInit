@@ -7,8 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Slf4j
 public class NormalErrorException extends Exception{
-    int errorCode;
-    String errorMessage;
+    final int errorCode;
+    final String errorMessage;
 
     public NormalErrorException(ErrorEnum errorEnum, String errorMessage) {
         this.errorCode = errorEnum.index;

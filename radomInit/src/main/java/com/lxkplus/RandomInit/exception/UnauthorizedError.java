@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "未登录")
 public class UnauthorizedError extends NormalErrorException{
     public UnauthorizedError() {
-        super(ErrorEnum.Unauthorized);
-        this.errorMessage = "未登录";
+        super(ErrorEnum.UNAUTHORIZED, "未登录");
     }
 }

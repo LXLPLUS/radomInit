@@ -30,7 +30,7 @@ public class ThrowUtils {
      */
     public static void throwIfNull(Object o, String msg) throws NormalErrorException {
         if (Objects.isNull(o)) {
-            throw new NormalErrorException(ErrorEnum.NULLError, msg);
+            throw new NormalErrorException(ErrorEnum.NULL_ERROR, msg);
         }
     }
 
@@ -43,11 +43,11 @@ public class ThrowUtils {
     public static void throwIfNullOrBlack(Object o, String msg) throws NormalErrorException {
         if (o instanceof String str) {
             if (StringUtils.isBlank(str)) {
-                throw new NormalErrorException(ErrorEnum.NULLError, msg);
+                throw new NormalErrorException(ErrorEnum.NULL_ERROR, msg);
             }
         }
         if (Objects.isNull(o)) {
-            throw new NormalErrorException(ErrorEnum.NULLError, msg);
+            throw new NormalErrorException(ErrorEnum.NULL_ERROR, msg);
         }
     }
 
@@ -58,10 +58,10 @@ public class ThrowUtils {
      */
     public static void throwIfNullOrEmpty(Collection<?> iterable, String msg) throws NormalErrorException {
         if (Objects.isNull(iterable)) {
-            throw new NormalErrorException(ErrorEnum.NULLError, msg);
+            throw new NormalErrorException(ErrorEnum.NULL_ERROR, msg);
         }
         if (!iterable.iterator().hasNext()) {
-            throw new NormalErrorException(ErrorEnum.NULLError, msg);
+            throw new NormalErrorException(ErrorEnum.NULL_ERROR, msg);
         }
     }
 
@@ -70,7 +70,7 @@ public class ThrowUtils {
             throwIfNull(null, "空指针异常");
         }
         if (!Objects.requireNonNull(o).getClass().isAssignableFrom(type)) {
-            throw new NormalErrorException(ErrorEnum.paramNotSupport, msg);
+            throw new NormalErrorException(ErrorEnum.PARAM_NOT_SUPPORT, msg);
         }
     }
 }

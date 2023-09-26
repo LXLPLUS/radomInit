@@ -191,7 +191,7 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
-    public TableParams convertStatementToVo(String sql) throws NormalErrorException {
+    public TableParams convertStatToVo(String sql) throws NormalErrorException {
         if (StringUtils.isBlank(sql)) {
             ThrowUtils.throwIfNullOrBlack(sql, "字符串为空");
         }
@@ -201,7 +201,7 @@ public class TableServiceImpl implements TableService {
             sqlStatement = SQLUtils.parseSingleMysqlStatement(sql);
         }
         catch (Exception e) {
-            throw new NormalErrorException(ErrorEnum.NotEnoughParams, e.getMessage());
+            throw new NormalErrorException(ErrorEnum.NOT_ENOUGH_PARAMS, e.getMessage());
         }
 
         TableParams tableParams = new TableParams();
@@ -243,7 +243,7 @@ public class TableServiceImpl implements TableService {
                         .ifNotEmpty(tableColumn::setDefault);
 
                 List<SQLExpr> arguments = columnDefinition.getDataType().getArguments();
-                if (arguments.size() >= 1) {
+                if (!arguments.isEmpty()) {
                     tableColumn.setParam1(Integer.parseInt(arguments.get(0).toString()));
                 }
                 if (arguments.size() >= 2) {
@@ -323,7 +323,7 @@ public class TableServiceImpl implements TableService {
             log.info(tableParams.toString());
             return tableParams;
         }
-        throw new NormalErrorException(ErrorEnum.paramNotSupport, "不是建表语句的DDL！");
+        throw new NormalErrorException(ErrorEnum.PARAM_NOT_SUPPORT, "不是建表语句的DDL！");
     }
     @Override
     public void createTable(String actionID, String userSchemaName, String sql) throws NormalErrorException {
@@ -332,7 +332,7 @@ public class TableServiceImpl implements TableService {
 
         String realSchemaName = schemaService.getRealSchemaName(actionID, userSchemaName);
         ThrowUtils.throwIf(!mysqlCheckService.checkDatabaseExist(actionID, userSchemaName, false),
-                ErrorEnum.Empty,
+                ErrorEnum.EMPTY,
                 realSchemaName + "数据库不存在");
 
         MySqlCreateTableStatement statement = sqlService.readCreateSql(sql);
@@ -340,7 +340,7 @@ public class TableServiceImpl implements TableService {
 
         // 如果数据库存在那么跳过
         ThrowUtils.throwIf(mysqlCheckService.checkTableExist(actionID, userSchemaName, tableName, false),
-                ErrorEnum.Exist,
+                ErrorEnum.EXIST,
                 String.format("action:%s 数据库:%s对应表%s存在", actionID, userSchemaName, tableName));
         statement.setIfNotExiists(false);
         statement.setSchema(realSchemaName);
@@ -354,7 +354,7 @@ public class TableServiceImpl implements TableService {
         mysqlCheckService.checkTableNameSafe(actionID, userSchemaName, tableName);
 
         ThrowUtils.throwIf(!mysqlCheckService.checkTableExist(actionID, userSchemaName, tableName, false),
-                ErrorEnum.Empty,
+                ErrorEnum.EMPTY,
                 String.format("操作的表格%s不存在！", tableName));
 
         String realSchemaName = schemaService.getRealSchemaName(actionID, userSchemaName);
@@ -370,7 +370,7 @@ public class TableServiceImpl implements TableService {
         mysqlCheckService.checkTableNameSafe(actionID, databaseName, tableName);
 
         ThrowUtils.throwIf(!mysqlCheckService.checkTableExist(actionID, databaseName, tableName, false),
-                ErrorEnum.Empty,
+                ErrorEnum.EMPTY,
                 String.format("操作的表格%s不存在！", tableName));
 
         String realSchemaName = schemaService.getRealSchemaName(actionID, databaseName);

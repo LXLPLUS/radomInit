@@ -17,7 +17,7 @@ public class ColumnBuilderInfo {
     String actionID;
     String userSchemaName;
     String tableName;
-    String ColumnName;
+    String columnName;
     @TableField("builder_ruler")
     String builderRuler;
     String rulerType;

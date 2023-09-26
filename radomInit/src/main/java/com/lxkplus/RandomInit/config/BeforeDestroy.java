@@ -13,7 +13,7 @@ public class BeforeDestroy implements DisposableBean {
     SchemaService schemaService;
 
     @Value("${randomInit.destroy-all-exist}")
-    Boolean clearAllExist;
+    boolean clearAllExist;
 
     @Override
     public void destroy() {

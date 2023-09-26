@@ -51,7 +51,7 @@ public class SelectServiceImpl implements SelectService {
                                 userSchemaName,
                                 databaseNameHelper.getTableName(),
                                 false),
-                        ErrorEnum.NotExist,
+                        ErrorEnum.NOT_EXIST,
                         "对应的数据库" + userSchemaName + "." + databaseNameHelper.getTableName() + "不存在");
             }
         }
@@ -203,6 +203,6 @@ public class SelectServiceImpl implements SelectService {
                 return;
             }
         }
-        throw new NormalErrorException(ErrorEnum.paramNotSupport, "参数" + owner + "不存在");
+        throw new NormalErrorException(ErrorEnum.PARAM_NOT_SUPPORT, "参数" + owner + "不存在");
     }
 }

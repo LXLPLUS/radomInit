@@ -13,21 +13,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @Value("${randomInit.debug-mode}")
-    Boolean debugMode;
+    boolean debugMode;
 
     @ExceptionHandler(NormalErrorException.class)
-    public ErrorBodyResponse NormalErrorExceptionHandler(NormalErrorException e) {
+    public ErrorBodyResponse normalErrorExceptionHandler(NormalErrorException e) {
         return new ErrorBodyResponse(e.getErrorCode(), e.getErrorMessage());
     }
 
     @ExceptionHandler(JSQLParserException.class)
-    public ErrorBodyResponse NormalErrorExceptionHandler(JSQLParserException e) {
+    public ErrorBodyResponse normalErrorExceptionHandler(JSQLParserException e) {
         return new ErrorBodyResponse(-2, "sql解析失败！");
     }
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ErrorBodyResponse BlindExceptionHandler(Exception e) {
+    public ErrorBodyResponse blindExceptionHandler(Exception e) {
         log.warn("出现错误，错误原因为 {}", e.getMessage());
         if (debugMode) {
             e.printStackTrace();
@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ErrorBodyResponse ExceptionHandler(Exception e) {
+    public ErrorBodyResponse exceptionHandler(Exception e) {
         log.warn("出现错误，错误原因为 {}", e.getMessage());
         if (debugMode) {
             e.printStackTrace();

@@ -57,8 +57,11 @@
 
   <n-divider/>
 
-  <n-dynamic-input :on-create="onCreateIndex" v-model:value="tableIndex">
-    <template #default="{ value }">
+  <n-dynamic-input
+      :on-create="onCreateIndex"
+      v-model:value="tableIndex"
+  >
+    <template #default="{ value, index }">
       <n-grid x-gap="12" :cols="6">
         <n-gi>
           <n-input v-model:value="value.indexName" placeholder="索引名称"/>
@@ -133,10 +136,27 @@ import InputSQL from "./InputSQL.vue";
 import mysqlParams from "../hooks/mysqlParams";
 import getHook from "../hooks/getHook";
 import postMapper from "../hooks/postMapper";
+import {
+  ChevronDoubleUp16Regular as upIcon,
+  ChevronDoubleDown16Filled as downIcon,
+} from '@vicons/fluent'
+
+import {
+  AddBoxOutlined as addIcon,
+  IndeterminateCheckBoxOutlined as removeIcon
+} from "@vicons/material"
 
 export default defineComponent({
   name: "tableCreate",
-  components: {InputSQL, MysqlTypeSelect, Code},
+  components: {
+    InputSQL,
+    MysqlTypeSelect,
+    Code,
+    upIcon,
+    downIcon,
+    addIcon,
+    removeIcon
+  },
   setup() {
 
     const code = ref("")

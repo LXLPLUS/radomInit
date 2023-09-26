@@ -8,7 +8,7 @@ public interface TableService {
 
     MySqlCreateTableStatement convertVoToStatement(TableParams tableParams);
 
-    TableParams convertStatementToVo(String sql) throws NormalErrorException;
+    TableParams convertStatToVo(String sql) throws NormalErrorException;
 
     void createTable(String actionID, String databaseName, String sql) throws NormalErrorException;
 

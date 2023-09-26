@@ -32,6 +32,6 @@ public class TableController {
     @PostMapping("/explainSql")
     @ResponseBody
     public BodyResponse<TableParams> regexCheck(@Valid @RequestBody Map<String, String> sqlMap) throws NormalErrorException {
-        return new BodyResponse<>(tableService.convertStatementToVo(sqlMap.getOrDefault("sql", "")));
+        return new BodyResponse<>(tableService.convertStatToVo(sqlMap.getOrDefault("sql", "")));
     }
 }

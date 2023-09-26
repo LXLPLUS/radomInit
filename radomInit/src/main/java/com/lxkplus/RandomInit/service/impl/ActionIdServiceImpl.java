@@ -35,16 +35,16 @@ public class ActionIdServiceImpl implements ActionIdService {
     @Resource
     CacheBuffer cacheBuffer;
 
-    static final String defaultDatabaseName = "default";
+    static final String DEFAULT_DATABASE_NAME = "default";
 
     @Override
     public void createUserID(String actionID) throws NormalErrorException {
         // 生成默认数据库
-        schemaService.createSchema(actionID, defaultDatabaseName);
+        schemaService.createSchema(actionID, DEFAULT_DATABASE_NAME);
         // 指定活动数据库
         UserMessage env = envService.getEnv(actionID);
         env.setActionID(actionID);
-        env.setActiveDatabase(defaultDatabaseName);
+        env.setActiveDatabase(DEFAULT_DATABASE_NAME);
         // 设置为第一步
         env.setStep(0);
     }

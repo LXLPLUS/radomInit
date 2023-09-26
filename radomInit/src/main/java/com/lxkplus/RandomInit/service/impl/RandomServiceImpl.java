@@ -170,11 +170,7 @@ public class RandomServiceImpl implements RandomService {
             params = Collections.emptyList();
         }
         switch (buildRuler){
-            case "string":
-            case "字符串":
-            case "字母":
-            case "varchar":
-            case "char":
+            case "string", "字符串", "字母", "varchar", "char":
                 if (params.isEmpty()) {
                     return RandomStringUtils.randomPrint(0, 20).replaceAll("['\"\\\\{}]", "");
                 }
@@ -192,17 +188,10 @@ public class RandomServiceImpl implements RandomService {
             case "string|param1|param2":
                 return RandomStringUtils.randomPrint(Integer.parseInt(params.get(0)), Integer.parseInt(params.get(1)))
                         .replaceAll("['\"\\\\{}]", "");
-            case "正则":
-            case "正则表达式":
-            case "regex":
-                ThrowUtils.throwIf(params.isEmpty(), ErrorEnum.NotEnoughParams, "缺乏正则表达式参数");
+            case "正则", "正则表达式", "regex":
+                ThrowUtils.throwIf(params.isEmpty(), ErrorEnum.NOT_ENOUGH_PARAMS, "缺乏正则表达式参数");
                 return faker.regexify(params.get(0));
-            case "long":
-            case "int":
-            case "integer":
-            case "数字":
-            case "range":
-            case "范围":
+            case "long", "int", "integer", "数字", "range", "范围":
                 if (params.isEmpty()) {
                     return faker.number().numberBetween(0, Integer.MAX_VALUE / 10);
                 }
@@ -214,12 +203,11 @@ public class RandomServiceImpl implements RandomService {
                 return faker.number().numberBetween(Long.parseLong(params.get(0)), Integer.MAX_VALUE / 2);
             case "range|param1|param2":
                 return faker.number().numberBetween(Long.parseLong(params.get(0)), Long.parseLong(params.get(1)));
-            case "时间":
-            case "time":
+            case "时间", "time":
                 Date startTime = DateUtils.addDays(new Date(), -100);
                 Date endTime = DateUtils.addDays(new Date(), 100);
                 try {
-                    if (params.size() >= 1) {
+                    if (!params.isEmpty()) {
                         startTime = DateUtils.parseDate(params.get(0), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
                     }
                     if (params.size() >= 2) {
@@ -243,30 +231,21 @@ public class RandomServiceImpl implements RandomService {
                 return faker.number().numberBetween(1, Integer.MAX_VALUE / 10);
             case "手机号":
                 return faker.regexify("1[0-9]{10}");
-            case "ip":
-            case "ipv4":
+            case "ip", "ipv4":
                 return faker.internet().ipV4Address();
             case "uuid":
                 return faker.internet().uuid();
             case "url":
                 return faker.internet().url();
-            case "名字":
-            case "name":
+            case "名字", "name":
                 return faker.name().name();
-            case "default":
-            case "默认值":
-            case "枚举":
-            case "enum":
-                ThrowUtils.throwIf(params.isEmpty(), ErrorEnum.NotEnoughParams, "缺乏默认值");
+            case "default", "默认值", "枚举", "enum":
+                ThrowUtils.throwIf(params.isEmpty(), ErrorEnum.NOT_ENOUGH_PARAMS, "缺乏默认值");
                 int index = faker.number().numberBetween(0, params.size());
                 return params.get(index);
-            case "金钱":
-            case "钱":
-            case "money":
+            case "金钱", "钱", "money":
                 return faker.number().randomDouble(2, 0, 1000000);
-            case "邮箱":
-            case "mail":
-            case "email":
+            case "邮箱", "mail", "email":
                 return faker.internet().emailAddress(faker.funnyName().name())
                         .replaceAll("\s+", "");
             default:
@@ -277,7 +256,7 @@ public class RandomServiceImpl implements RandomService {
     @Override
     public List<String> createPool(String actionID, String poolName,
                                    String buildRuler, List<String> params, int count) throws NormalErrorException {
-        ThrowUtils.throwIf(count > 1e5, ErrorEnum.LengthTooLong, "一次生成的数据量超过最大限制10W");
+        ThrowUtils.throwIf(count > 1e5, ErrorEnum.LENGTH_TOO_LONG, "一次生成的数据量超过最大限制10W");
 
         List<String> data = new ArrayList<>();
         for (int i = 0; i < count; i++) {
@@ -336,8 +315,7 @@ public class RandomServiceImpl implements RandomService {
         switch (mysqlEnum) {
             case INT:
                 return faker.number().numberBetween(0, Integer.MAX_VALUE / 10);
-            case BIGINT:
-            case LONG:
+            case BIGINT, LONG:
                 return faker.number().numberBetween(0, Long.MAX_VALUE / 10);
             case DOUBLE:
                 return faker.number().randomDouble(3, 0, Long.MAX_VALUE / 100);
@@ -347,9 +325,7 @@ public class RandomServiceImpl implements RandomService {
                 int sqlExpr = ((SQLIntegerExpr) arguments.get(0)).getNumber().intValue() - 10;
                 sqlExpr = Math.max(sqlExpr, 2);
                 return RandomStringUtils.randomPrint(0, sqlExpr).replaceAll("['\"\\\\{}]", "");
-            case DATETIME:
-            case DATE:
-            case TIMESTAMP:
+            case DATETIME, DATE, TIMESTAMP:
                 Date startTime = DateUtils.addDays(new Date(), -1);
                 String message = String.format("%s_%s_%s",
                         mySqlInsertStatement.getTableSource().getTableName(),
@@ -366,11 +342,10 @@ public class RandomServiceImpl implements RandomService {
                 return faker.number().randomDouble(sqlExpr2,
                         0,
                         (long) Math.pow(10, sqlExpr1 - sqlExpr2) - 1);
-            case TINYINT:
-            case BOOL:
+            case TINYINT, BOOL:
                 return faker.number().numberBetween(0, 2);
             default:
-                throw new NormalErrorException(ErrorEnum.paramNotSupport, String.format("%s这个参数不支持",
+                throw new NormalErrorException(ErrorEnum.PARAM_NOT_SUPPORT, String.format("%s这个参数不支持",
                         sqlColumnDefinition.getDataType().getName().toUpperCase()));
         }
     }
@@ -403,13 +378,13 @@ public class RandomServiceImpl implements RandomService {
         try {
             faker.regexify(buildRuler.getParams().get(0));
         } catch (Exception e) {
-            throw new NormalErrorException(ErrorEnum.NotExist, "正则表达式不支持！");
+            throw new NormalErrorException(ErrorEnum.NOT_EXIST, "正则表达式不支持！");
         }
         List<String> ans = new ArrayList<>();
         for (int i = 0; i < buildRuler.getCount(); i++) {
             ans.add(faker.regexify(buildRuler.getParams().get(0)));
             if (ans.get(i).length() > 1e5) {
-                throw new NormalErrorException(ErrorEnum.LengthTooLong);
+                throw new NormalErrorException(ErrorEnum.LENGTH_TOO_LONG);
             }
         }
         return ans;
@@ -423,7 +398,7 @@ public class RandomServiceImpl implements RandomService {
                 "params", registerRulerVo.getParams()));
 
         if (!regexRegisterDos.isEmpty()) {
-            throw new NormalErrorException(ErrorEnum.Exist, "规则已经存在");
+            throw new NormalErrorException(ErrorEnum.EXIST, "规则已经存在");
         }
 
         // 填入一次默认值

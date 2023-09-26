@@ -9,5 +9,5 @@ public class RegisterRulerVo {
     @NotNull
     String rulerType;
     @NotNull
-    String Params;
+    String params;
 }
