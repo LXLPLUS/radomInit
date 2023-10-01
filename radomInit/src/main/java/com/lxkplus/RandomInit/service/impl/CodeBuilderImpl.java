@@ -32,11 +32,20 @@ public class CodeBuilderImpl {
     public String mybatisPlusGather(TableParams tableParams, MybatisParams mybatisParams) {
         StringOptional.of(tableParams.getTableHeader().getTableName())
                 .ifBlank(x -> tableParams.getTableHeader().setTableName(faker.pokemon().name()));
-        String tableName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, tableParams.getTableHeader().getTableName());
-        TypeSpec.Builder builder = TypeSpec.classBuilder(tableName).addModifiers(Modifier.PUBLIC);
+        String tableName = tableParams.getTableHeader().getTableName();
+
+        if (!tableParams.getTableHeader().getTableName().contains("_")) {
+            tableName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, tableName);
+        }
+        else {
+            tableName = StringUtils.removeStart(tableName, "t_");
+            tableName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName);
+        }
+        TypeSpec.Builder builder = TypeSpec.classBuilder(tableName.replace("T_", ""))
+                .addModifiers(Modifier.PUBLIC);
 
         String lowerTableName = StringOptional.of(tableParams.getTableHeader().getTableName())
-                .lowerCamelToLowerUnderscore().get();
+                .lowerCamelToLowerUnderscore().addFix("\"").get();
 
         builder.addAnnotation(Data.class);
         if (mybatisParams.isDefaultTableName()) {

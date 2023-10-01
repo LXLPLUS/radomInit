@@ -29,22 +29,16 @@ public class CacheBuffer {
     @Resource
     Faker faker;
 
-    ConcurrentMap<String, Long>  increaseCache;
-    ConcurrentMap<String, Date>  timeCache;
+    ConcurrentMap<String, Object>  cache;
     ConcurrentMap<String, LinkedHashSet<String>> poolCache;
 
     CacheBuffer() {
 
-        Cache<String, Long> build = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
+        Cache<String, Object> build = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
                 .maximumSize(100)
                 .build();
-        increaseCache = build.asMap();
+        cache = build.asMap();
 
-        Cache<String, Date> build2 = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
-                .maximumSize(100)
-                .build();
-
-        timeCache = build2.asMap();
 
         Cache<String, LinkedHashSet<String>> build3 = Caffeine.newBuilder()
                 .expireAfterWrite(15, TimeUnit.MINUTES)
@@ -52,44 +46,42 @@ public class CacheBuffer {
                 .softValues()
                 .build();
 
-        poolCache = build3.asMap();
-
     }
 
     public long getIncrease(String actionID, String str, long startNumber, long minStep, long maxStep) throws NormalErrorException {
         mysqlCheckService.checkActionIDSafe(actionID);
 
         str = actionID + SEP + str;
-        long num = increaseCache.getOrDefault(str, startNumber - 1);
-        increaseCache.put(str, num + faker.number().numberBetween(minStep, maxStep));
-        return increaseCache.get(str);
+        long num = (Long) cache.getOrDefault(str, startNumber - 1);
+        cache.put(str, num + faker.number().numberBetween(minStep, maxStep));
+        return (Long) cache.get(str);
     }
 
     public long getIncrease(String actionID, String str, long startNumber) throws NormalErrorException {
         mysqlCheckService.checkActionIDSafe(actionID);
 
         str = actionID + SEP + str;
-        Long num = increaseCache.getOrDefault(str, startNumber - 1);
-        increaseCache.put(str, num + 1);
-        return increaseCache.get(str);
+        Long num = (Long) cache.getOrDefault(str, startNumber - 1);
+        cache.put(str, num + 1);
+        return (Long) cache.get(str);
     }
 
     public Date getTime(String actionID, String str, Date startTime, int minSecond, int maxSecond) throws NormalErrorException {
         mysqlCheckService.checkActionIDSafe(actionID);
 
         str = actionID + SEP + str;
-        Date time = DateUtils.addSeconds(timeCache.getOrDefault(str, startTime), faker.number().numberBetween(minSecond, maxSecond));
-        timeCache.put(str, time);
-        return timeCache.get(str);
+        Date time = DateUtils.addSeconds((Date) cache.getOrDefault(str, startTime), faker.number().numberBetween(minSecond, maxSecond));
+        cache.put(str, time);
+        return (Date) cache.get(str);
     }
 
     public Date getTime(String actionID, String str, Date startTime) throws NormalErrorException {
         mysqlCheckService.checkActionIDSafe(actionID);
 
         str = actionID + SEP + str;
-        Date time = DateUtils.addSeconds(timeCache.getOrDefault(str, startTime), 60);
-        timeCache.put(str, time);
-        return timeCache.get(str);
+        Date time = DateUtils.addSeconds((Date) cache.getOrDefault(str, startTime), 60);
+        cache.put(str, time);
+        return (Date) cache.get(str);
     }
 
     public String createRandomPoolName(String actionID) throws NormalErrorException {
@@ -141,10 +133,19 @@ public class CacheBuffer {
         }
     }
 
+    public void put(String actionID, String name, Object data) {
+        name = actionID + SEP + name;
+        cache.put(name, data);
+    }
+
+    public Object get(String actionID, String name) {
+        return cache.getOrDefault(actionID + SEP + name, null);
+    }
+
+
     public void logAllCache() {
         log.info("  =======   缓存信息   =======");
-        increaseCache.keySet().forEach(log::info);
-        timeCache.keySet().forEach(log::info);
+        cache.keySet().forEach(log::info);
         poolCache.keySet().forEach(log::info);
         log.info("  =======   缓存信息   =======");
     }

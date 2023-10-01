@@ -26,7 +26,6 @@ public class LogInterceptor implements HandlerInterceptor {
             timer = new Timer();
             timer.flushStartTime();
             log.info("url: " + request.getRequestURI());
-            request.getSession().getAttributeNames().asIterator().forEachRemaining(x -> log.info("session" + x + ":" + request.getSession().getAttribute(x)));
         }
         if (request.getSession(true).getAttribute("actionID") == null) {
             throw new UnauthorizedError();
@@ -41,5 +40,4 @@ public class LogInterceptor implements HandlerInterceptor {
             log.info("耗费的时间为" + timer.getSpendMillis() + "ms");
         }
     }
-
 }

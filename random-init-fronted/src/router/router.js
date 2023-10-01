@@ -7,7 +7,8 @@ import TableCreate from "../components/TableCreate.vue"
 import {
     createDiscreteApi
 } from 'naive-ui'
-
+import logExplain from "../components/LogExplain.vue";
+import JsonExplain from "../components/JsonExplain.vue";
 const { message } = createDiscreteApi(
     ["message"]
 );
@@ -35,6 +36,14 @@ const routes = [
     {
         path: "/tableCreate",
         component: TableCreate
+    },
+    {
+        path: "/logExplain",
+        component: logExplain
+    },
+    {
+        path: "/jsonExplain",
+        component: JsonExplain
     }
 ]
 
@@ -54,12 +63,12 @@ router.beforeEach(async (to, from, next) => {
     }
     const response = await fetch("/backend/loginCheck").then(data => data.json()).catch(() => message.warning("网络错误"))
 
-    if (response.data.login === true) {
-        return next()
-    }
-    if (response.data.login === false) {
+    if (response.data.login === void 0 || response.data.login === false) {
         message.warning("未登录！")
         return next("/LoginAndRegister")
+    }
+    if (response.data.login === true) {
+        return next()
     }
     message.warning("网络错误")
     return next("/LoginAndRegister")

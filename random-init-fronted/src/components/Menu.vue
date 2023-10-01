@@ -30,7 +30,6 @@
       <router-view/>
     </n-layout-content>
   </n-layout>
-
 </template>
 
 <script lang="ts">
@@ -82,6 +81,45 @@ const menuOptions: MenuOption[] = [
         key: 'tableCreate',
         icon: renderIcon(WorkIcon)
       }
+    ]
+  },
+  {
+    label: "日志/json分析",
+    key: "explain",
+    icon: renderIcon(WorkIcon),
+    children: [
+      {
+        label: () =>
+            h(
+                RouterLink,
+                {
+                  to: {
+                    path: "/logExplain"
+                  }
+                },
+                {
+                  default: () => "日志分析"
+                }
+            ),
+        key: "logExplain",
+        icon: renderIcon(WorkIcon)
+      },
+      {
+        label: () =>
+            h(
+                RouterLink,
+                {
+                  to: {
+                    path: "/jsonExplain"
+                  }
+                },
+                {
+                  default: () => "json生成"
+                }
+            ),
+        key: "jsonExplain",
+        icon: renderIcon(WorkIcon)
+      },
     ]
   },
   {

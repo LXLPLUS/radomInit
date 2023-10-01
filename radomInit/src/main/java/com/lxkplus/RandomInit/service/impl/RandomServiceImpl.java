@@ -341,7 +341,7 @@ public class RandomServiceImpl implements RandomService {
                 int sqlExpr2 = ((SQLIntegerExpr) arguments.get(1)).getNumber().intValue();
                 return faker.number().randomDouble(sqlExpr2,
                         0,
-                        (long) Math.pow(10, sqlExpr1 - sqlExpr2) - 1);
+                        (long) Math.pow(10, (double) sqlExpr1 - sqlExpr2) - 1);
             case TINYINT, BOOL:
                 return faker.number().numberBetween(0, 2);
             default:
@@ -402,7 +402,7 @@ public class RandomServiceImpl implements RandomService {
         }
 
         // 填入一次默认值
-        BuildRuler buildRuler = new BuildRuler();
+        BuildRuler buildRuler =  new BuildRuler();
         buildRuler.setParams(List.of(registerRulerVo.getParams()));
         buildRuler.setCount(1);
         String example = getDataByRegex(buildRuler).get(0);

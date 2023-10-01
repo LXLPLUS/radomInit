@@ -17,11 +17,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NormalErrorException.class)
     public ErrorBodyResponse normalErrorExceptionHandler(NormalErrorException e) {
+        e.printStackTrace();
+        log.warn("出现错误，错误原因为 {}", e.getErrorMessage());
         return new ErrorBodyResponse(e.getErrorCode(), e.getErrorMessage());
     }
 
     @ExceptionHandler(JSQLParserException.class)
     public ErrorBodyResponse normalErrorExceptionHandler(JSQLParserException e) {
+        e.printStackTrace();
         return new ErrorBodyResponse(-2, "sql解析失败！");
     }
 
@@ -29,6 +32,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ErrorBodyResponse blindExceptionHandler(Exception e) {
         log.warn("出现错误，错误原因为 {}", e.getMessage());
+        e.printStackTrace();
         if (debugMode) {
             e.printStackTrace();
             return new ErrorBodyResponse(-3, e.getMessage());

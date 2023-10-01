@@ -201,7 +201,14 @@ export default defineComponent({
       }
     ])
 
-    const mybatisConfigs = ref(["defaultTableName", "addComment", "valid", "boxed"])
+    const mybatisConfigs = ref(
+        [
+          "defaultTableName",
+          "addComment",
+          "valid",
+          "boxed"
+        ]
+    )
 
     let columnsLabel = computed(() => {
           const columnsList = []
@@ -347,8 +354,7 @@ export default defineComponent({
       if (response.data === void 0) {
         message.warning(response["errorMessage"])
         code.value = ""
-      }
-      else {
+      } else {
         code.value = response.data["code"]
       }
     }

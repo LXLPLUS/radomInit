@@ -57,14 +57,22 @@ public class TableServiceImpl implements TableService {
 
         MySqlCreateTableStatement statement = new MySqlCreateTableStatement();
 
-        StringOptional.of(tableParams.getTableHeader().getTableName())
-                .trimToEmpty()
-                .emptyMap(x -> faker.pokemon().name())
-                .replaceAll("[^a-zA-Z0-9]", "")
-                .lowerCamelToLowerUnderscore()
-                .addFix("`")
-                .ifNotEmpty(statement::setName);
-
+        if (tableParams.getTableHeader().getTableName() != null && tableParams.getTableHeader().getTableName().contains("_")) {
+            StringOptional.of(tableParams.getTableHeader().getTableName())
+                    .trimToEmpty()
+                    .trim("`")
+                    .addFix("`").
+                    ifNotEmpty(statement::setName);
+        }
+        else {
+            StringOptional.of(tableParams.getTableHeader().getTableName())
+                    .trimToEmpty()
+                    .emptyMap(x -> faker.pokemon().name())
+                    .replaceAll("[^a-zA-Z0-9]", "")
+                    .lowerCamelToLowerUnderscore()
+                    .addFix("`")
+                    .ifNotEmpty(statement::setName);
+        }
 
         StringOptional.of(tableParams.getTableHeader().getEngine())
                 .ifNotBlank(engine -> statement.getTableOptions().add(new SQLAssignItem(new SQLIdentifierExpr("ENGINE"), new SQLIdentifierExpr(engine))));
