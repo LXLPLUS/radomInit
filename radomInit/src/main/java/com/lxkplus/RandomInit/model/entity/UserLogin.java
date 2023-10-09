@@ -1,4 +1,4 @@
-package com.lxkplus.RandomInit.model.DO;
+package com.lxkplus.RandomInit.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -9,19 +9,15 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("column_info")
-public class ColumnBuilderInfo {
+@TableName("t_user_login")
+public class UserLogin {
     @TableId(type = IdType.AUTO)
     Integer id;
+    String userName;
+    String password;
+    Date createTime;
+    int level;
     @TableField("action_id")
     String actionID;
-    String userSchemaName;
-    String tableName;
-    String columnName;
-    @TableField("builder_ruler")
-    String builderRuler;
-    String rulerType;
-    String params;
-    Date insertTime;
-    String poolName;
+    String comment;
 }

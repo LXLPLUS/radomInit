@@ -16,6 +16,9 @@ public interface TableActionMapper {
     @Insert("${sql}")
     void fillRandomData(String sql);
 
+    @Delete("drop database ${databaseName}")
+    void dropDatabase(String databaseName);
+
     @Select("${sql}")
     List<LinkedHashMap<String, String>> SelectData(String sql);
 

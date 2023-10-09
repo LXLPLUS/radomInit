@@ -1,4 +1,4 @@
-package com.lxkplus.RandomInit.model.VO;
+package com.lxkplus.RandomInit.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

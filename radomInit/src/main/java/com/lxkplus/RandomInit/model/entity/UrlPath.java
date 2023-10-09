@@ -1,4 +1,4 @@
-package com.lxkplus.RandomInit.model.DO;
+package com.lxkplus.RandomInit.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

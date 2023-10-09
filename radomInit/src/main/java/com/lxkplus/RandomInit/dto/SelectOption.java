@@ -1,4 +1,4 @@
-package com.lxkplus.RandomInit.model.VO;
+package com.lxkplus.RandomInit.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

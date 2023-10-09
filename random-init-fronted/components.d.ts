@@ -12,7 +12,6 @@ declare module 'vue' {
     Enum: typeof import('./src/components/Enum.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
     InputSQL: typeof import('./src/components/InputSQL.vue')['default']
-    JsonExpain: typeof import('./src/components/JsonExpain.vue')['default']
     JsonExplain: typeof import('./src/components/JsonExplain.vue')['default']
     LogExplain: typeof import('./src/components/LogExplain.vue')['default']
     Login: typeof import('./src/components/Login.vue')['default']
@@ -24,6 +23,7 @@ declare module 'vue' {
     NCard: typeof import('naive-ui')['NCard']
     NCode: typeof import('naive-ui')['NCode']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
+    NDataTable: typeof import('naive-ui')['NDataTable']
     NDivider: typeof import('naive-ui')['NDivider']
     NDynamicInput: typeof import('naive-ui')['NDynamicInput']
     NForm: typeof import('naive-ui')['NForm']
@@ -55,5 +55,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TableCreate: typeof import('./src/components/TableCreate.vue')['default']
+    TableList: typeof import('./src/components/TableList/TableList.vue')['default']
   }
 }

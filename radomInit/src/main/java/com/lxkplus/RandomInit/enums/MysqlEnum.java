@@ -38,10 +38,7 @@ public enum MysqlEnum {
     PRIMARY_KEY("PRIMARY KEY"),
     FULLTEXT("FULLTEXT"),
 
-    AUTO_INCREMENT("AUTO_INCREMENT"),
-
-    DefaultEngine("InnoDB"),
-    DefaultCharSet("utf8mb4");
+    AUTO_INCREMENT("AUTO_INCREMENT");
 
 
     String realParam;

@@ -1,11 +1,12 @@
 import {createDiscreteApi} from "naive-ui";
 
 export default function () {
-    const { message } = createDiscreteApi(
-        ["message"]
+    const { message, dialog } = createDiscreteApi(
+        ["message", "dialog"]
     );
 
     return {
-        message
+        message,
+        dialog
     }
 }

@@ -1,4 +1,4 @@
-<template>
+  <template>
   <n-grid x-gap="12" :cols="2">
     <n-gi>
       <n-gradient-text type="info">

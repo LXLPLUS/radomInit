@@ -1,10 +1,10 @@
 package com.lxkplus.RandomInit.controller;
 
 import com.lxkplus.RandomInit.commons.BodyResponse;
+import com.lxkplus.RandomInit.dto.BuildRuler;
+import com.lxkplus.RandomInit.dto.RegisterRulerVo;
+import com.lxkplus.RandomInit.dto.SelectOption;
 import com.lxkplus.RandomInit.exception.NormalErrorException;
-import com.lxkplus.RandomInit.model.VO.BuildRuler;
-import com.lxkplus.RandomInit.model.VO.RegisterRulerVo;
-import com.lxkplus.RandomInit.model.VO.SelectOption;
 import com.lxkplus.RandomInit.service.RandomService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
@@ -28,7 +28,7 @@ public class RulerController {
     HttpSession httpSession;
 
     @PostMapping("/regex")
-    public BodyResponse<List<String>> regexCheck(@Valid @RequestBody BuildRuler buildRuler) throws NormalErrorException {
+    public BodyResponse<List<String>> regexCheck(@RequestBody BuildRuler buildRuler) throws NormalErrorException {
         return new BodyResponse<>(randomService.getDataByRegex(buildRuler));
     }
 

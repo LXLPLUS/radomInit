@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lxkplus.RandomInit.mapper.CreateSqlMapper">
+    <select id="getAllByActionIdAndIsDelete" resultType="com.lxkplus.RandomInit.dto.TableMessage">
+        select count(*) as `count`,
+               max(update_time) as `update_time`,
+               table_name
+        from t_create_sql where action_id = #{actionId} and is_delete = 0
+        group by table_name
+        order by max(update_time)
+    </select>
+</mapper>

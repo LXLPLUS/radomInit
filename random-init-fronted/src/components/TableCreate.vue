@@ -94,11 +94,11 @@
     </n-gi>
     <n-gi>
       <n-button type="success" @click="gatherTable">
-        从表单生成sql
+        sql生成
       </n-button>
     </n-gi>
     <n-gi>
-      <n-button type="success"> 记录</n-button>
+      <n-button type="success" @click="testAndSave"> 记录</n-button>
     </n-gi>
   </n-grid>
 
@@ -130,7 +130,6 @@
 <script>
 import {defineComponent} from "vue";
 import Code from "./Code.vue";
-import {useMessage} from "naive-ui"
 import MysqlTypeSelect from "./MysqlTypeSelect.vue";
 import InputSQL from "./InputSQL.vue";
 import mysqlParams from "../hooks/mysqlParams";
@@ -145,6 +144,7 @@ import {
   AddBoxOutlined as addIcon,
   IndeterminateCheckBoxOutlined as removeIcon
 } from "@vicons/material"
+import messageHook from "../hooks/messageHook";
 
 export default defineComponent({
   name: "tableCreate",
@@ -164,7 +164,8 @@ export default defineComponent({
       "condition": false
     })
 
-    const message = useMessage()
+    const message = messageHook().message
+    const dialog = messageHook().dialog
 
     const charSetParams = mysqlParams().charSetParams
     const indexParams = mysqlParams().indexParams
@@ -173,6 +174,7 @@ export default defineComponent({
     const tableHead = mysqlParams().tableHead
     const tableIndex = mysqlParams().tableIndex
     const columns = mysqlParams().columns
+
 
     const createSql = reactive({
       data: ""
@@ -354,8 +356,24 @@ export default defineComponent({
       if (response.data === void 0) {
         message.warning(response["errorMessage"])
         code.value = ""
-      } else {
+      }
+      else {
         code.value = response.data["code"]
+      }
+    }
+
+    async function testAndSave() {
+      await gatherTable()
+      const response = await postMapper().post("/backend/registerDDL", {sql: code.value})
+      if (response.pass === true) {
+        dialog.success({
+          title: "成功入库！"
+        })
+      }
+      else {
+        dialog.warning({
+          title: response.message
+        })
       }
     }
 
@@ -380,7 +398,8 @@ export default defineComponent({
       changeIndex,
       gatherMybatis,
       mybatisConfigs,
-      mybatisSelectParams
+      mybatisSelectParams,
+      testAndSave
     }
   }
 })

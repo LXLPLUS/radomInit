@@ -9,6 +9,8 @@ import java.util.Objects;
 
 public class ThrowUtils {
 
+    private ThrowUtils(){}
+
     /**
      * 通过某个条件校验是否异常
      * @param check 检查条件
@@ -45,6 +47,7 @@ public class ThrowUtils {
             if (StringUtils.isBlank(str)) {
                 throw new NormalErrorException(ErrorEnum.NULL_ERROR, msg);
             }
+            return;
         }
         if (Objects.isNull(o)) {
             throw new NormalErrorException(ErrorEnum.NULL_ERROR, msg);

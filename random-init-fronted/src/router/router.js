@@ -8,7 +8,7 @@ import {
     createDiscreteApi
 } from 'naive-ui'
 import logExplain from "../components/LogExplain.vue";
-import JsonExplain from "../components/JsonExplain.vue";
+import TableList from "../components/TableList/TableList.vue";
 const { message } = createDiscreteApi(
     ["message"]
 );
@@ -42,8 +42,8 @@ const routes = [
         component: logExplain
     },
     {
-        path: "/jsonExplain",
-        component: JsonExplain
+        path: "/tableList",
+        component: TableList
     }
 ]
 
@@ -63,7 +63,7 @@ router.beforeEach(async (to, from, next) => {
     }
     const response = await fetch("/backend/loginCheck").then(data => data.json()).catch(() => message.warning("网络错误"))
 
-    if (response.data.login === void 0 || response.data.login === false) {
+    if (response["data"] === void 0 || response.data.login === void 0 || response.data.login === false) {
         message.warning("未登录！")
         return next("/LoginAndRegister")
     }

@@ -442,7 +442,7 @@ export default function () {
                 dataType: "DATETIME",
                 pri: false,
                 allowNull: false,
-                defaultMessage: null,
+                defaultMessage: "CURRENT_TIMESTAMP",
                 extra: null,
                 comment: null
             },
@@ -451,7 +451,7 @@ export default function () {
                 dataType: "DATETIME",
                 pri: false,
                 allowNull: false,
-                defaultMessage: null,
+                defaultMessage: "CURRENT_TIMESTAMP",
                 extra: null,
                 comment: null
             },

@@ -8,7 +8,9 @@ import java.security.NoSuchAlgorithmException;
 
 public class MD5Utils {
 
-    final static String salt = "randomInit";
+    private MD5Utils(){}
+
+    final static String SALT = "randomInit";
     static MessageDigest md;
 
     static {
@@ -19,11 +21,11 @@ public class MD5Utils {
         }
     }
 
-    public static String SaltStr(String str) {
+    public static String saltStr(String str) {
         if (StringUtils.isBlank(str)) {
             return null;
         }
-        byte[] digest = md.digest((str + salt).getBytes(StandardCharsets.UTF_8));
+        byte[] digest = md.digest((str + SALT).getBytes(StandardCharsets.UTF_8));
         return byte2Hex(digest);
     }
 

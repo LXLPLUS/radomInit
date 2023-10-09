@@ -1,7 +1,6 @@
 package com.lxkplus.RandomInit.config;
 
 import com.lxkplus.RandomInit.mapper.TableActionMapper;
-import com.lxkplus.RandomInit.service.SchemaService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -15,10 +14,6 @@ public class InitApplicationListener implements ApplicationListener<ContextRefre
 
     @Resource
     TableActionMapper tableActionMapper;
-
-    @Resource
-    SchemaService schemaService;
-
 
     @Override
     public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
@@ -78,7 +73,20 @@ public class InitApplicationListener implements ApplicationListener<ContextRefre
                 ) ENGINE = InnoDB CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
                 """);
 
-        schemaService.dropAllSchema();
+
+        tableActionMapper.createTable("""
+                CREATE TABLE IF NOT EXISTS `t_user_database` (
+                    `id` INT(10) NOT NULL AUTO_INCREMENT COMMENT 'id',
+                    `action_id` VARCHAR(255) NOT NULL COMMENT '操作ID',
+                    `schema_name` VARCHAR(255) NOT NULL COMMENT '数据库名称',
+                    `create_time` DATETIME NOT NULL,
+                    `update_time` DATETIME NOT NULL,
+                    `is_delete` BOOLEAN NOT NULL DEFAULT '0',
+                    PRIMARY KEY (`id`),
+                    KEY (`action_id`),
+                    KEY (`schema_name`)
+                ) ENGINE = InnoDB CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci
+                """);
 
         log.info("===============   项目初始化完成！ =============");
     }

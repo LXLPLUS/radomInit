@@ -2,8 +2,8 @@ package com.lxkplus.RandomInit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lxkplus.RandomInit.commons.BodyResponse;
-import com.lxkplus.RandomInit.model.VO.MybatisParams;
-import com.lxkplus.RandomInit.model.VO.TableParams;
+import com.lxkplus.RandomInit.dto.MybatisParams;
+import com.lxkplus.RandomInit.dto.TableParams;
 import com.lxkplus.RandomInit.service.impl.CodeBuilderImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

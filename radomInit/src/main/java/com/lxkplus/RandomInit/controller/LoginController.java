@@ -1,13 +1,12 @@
 package com.lxkplus.RandomInit.controller;
 
 import com.lxkplus.RandomInit.commons.BodyResponse;
+import com.lxkplus.RandomInit.dto.UserInfo;
 import com.lxkplus.RandomInit.enums.ErrorEnum;
 import com.lxkplus.RandomInit.exception.NormalErrorException;
 import com.lxkplus.RandomInit.exception.ThrowUtils;
 import com.lxkplus.RandomInit.mapper.UserMapper;
-import com.lxkplus.RandomInit.model.DO.UserLogin;
-import com.lxkplus.RandomInit.model.VO.UserInfo;
-import com.lxkplus.RandomInit.service.SchemaService;
+import com.lxkplus.RandomInit.model.entity.UserLogin;
 import com.lxkplus.RandomInit.utils.MD5Utils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
@@ -30,9 +29,6 @@ public class LoginController {
     static final int MIN_PASS_WORD_LEN = 8;
 
     @Resource
-    SchemaService schemaService;
-
-    @Resource
     UserMapper userMapper;
 
     @Resource
@@ -47,7 +43,7 @@ public class LoginController {
         userLogin.setCreateTime(new Date());
         userLogin.setLevel(10);
         userLogin.setUserName(userInfo.getUserName());
-        String passwordSalt = MD5Utils.SaltStr(userInfo.getPassword());
+        String passwordSalt = MD5Utils.saltStr(userInfo.getPassword());
         userLogin.setPassword(passwordSalt);
 
         String timeStamp = Long.toString(userLogin.getCreateTime().getTime() % Integer.MAX_VALUE);
@@ -67,7 +63,7 @@ public class LoginController {
         checkVoidBodyResponse(userInfo);
 
         // 密码是单向加盐的
-        String salt = MD5Utils.SaltStr(userInfo.getPassword());
+        String salt = MD5Utils.saltStr(userInfo.getPassword());
 
         assert salt != null;
         List<UserLogin> userLogins = userMapper.selectByMap(Map.of("user_name", userInfo.getUserName(), "password", salt));
@@ -79,9 +75,6 @@ public class LoginController {
 
         // 注册session
         httpSession.setAttribute("actionID", userLogins.get(0).getActionID());
-
-        // 给这个用户加一个默认的数据库
-        schemaService.createSchema(userLogins.get(0).getActionID());
 
         return new BodyResponse<>(null, "成功登录");
     }
