@@ -43,7 +43,7 @@ public class TableController {
     @PostMapping("/registerDDL")
     @ResponseBody
     public BodyResponse<TestDDL> registerDDL(@Valid @RequestBody Map<String, String> sqlMap) {
-        return new BodyResponse<>(createSqlService.testAndSaveDDL(sqlMap.getOrDefault("sql", "")));
+        return new BodyResponse<>(createSqlService.testThenSaveDDL(sqlMap.getOrDefault("sql", "")));
     }
 
     @GetMapping("/tableList")

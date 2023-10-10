@@ -37,7 +37,7 @@ import { defineComponent, h, Component, ref } from 'vue'
 import { NIcon } from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
 import { RouterLink } from 'vue-router'
-import LoginAndRegister from "./LoginAndRegister.vue"
+import LoginAndRegister from "./login/LoginAndRegister.vue"
 import {
   LaptopOutline as WorkIcon,
 } from '@vicons/ionicons5'

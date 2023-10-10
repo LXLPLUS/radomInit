@@ -14,7 +14,7 @@ import java.util.List;
 */
 public interface CreateSqlService extends IService<CreateSql> {
 
-    TestDDL testAndSaveDDL(String sql);
+    TestDDL testThenSaveDDL(String sql);
 
     List<TableMessage> getDataByActionID();
 }

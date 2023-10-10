@@ -20,10 +20,7 @@ public interface TableActionMapper {
     void dropDatabase(String databaseName);
 
     @Select("${sql}")
-    List<LinkedHashMap<String, String>> SelectData(String sql);
-
-    @Delete("delete from ${databaseName}.${tableName}")
-    void clearData(String databaseName, String tableName);
+    List<LinkedHashMap<String, String>> selectData(String sql);
 
     @Select("select count(*) from ${databaseName}.${tableName}")
     int countRows(String databaseName, String tableName);

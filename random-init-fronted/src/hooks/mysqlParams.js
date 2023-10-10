@@ -456,7 +456,7 @@ export default function () {
                 comment: null
             },
             {
-                rowName: "isDelete",
+                rowName: "deleteFlag",
                 dataType: "BOOLEAN",
                 pri: false,
                 allowNull: false,

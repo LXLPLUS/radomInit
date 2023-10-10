@@ -42,7 +42,7 @@
 <script lang="ts">
 import { defineComponent, ref} from 'vue'
 import LoginHeader from "./LoginHeader.vue";
-import loginHook from "../hooks/loginHook.js"
+import loginHook from "../../hooks/loginHook.js"
 import { useRouter } from "vue-router";
 
 

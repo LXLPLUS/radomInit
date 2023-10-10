@@ -1,5 +1,6 @@
 package com.lxkplus.RandomInit.service.impl;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.javafaker.Faker;
@@ -41,8 +42,11 @@ public class CodeBuilderImpl {
             tableName = StringUtils.removeStart(tableName, "t_");
             tableName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName);
         }
+
+
         TypeSpec.Builder builder = TypeSpec.classBuilder(tableName.replace("T_", ""))
                 .addModifiers(Modifier.PUBLIC);
+
 
         String lowerTableName = StringOptional.of(tableParams.getTableHeader().getTableName())
                 .lowerCamelToLowerUnderscore().addFix("\"").get();
@@ -70,7 +74,7 @@ public class CodeBuilderImpl {
             }
             if (tableColumn.isPri() && mybatisParams.isDefaultTableName()) {
                 AnnotationSpec rowAnnotation = AnnotationSpec.builder(TableId.class)
-                        .addMember("type", "$N", "IdType.AUTO")
+                        .addMember("type", "$T.$L", IdType.class, IdType.AUTO)
                         .build();
                 rowBuilder.addAnnotation(rowAnnotation);
             }

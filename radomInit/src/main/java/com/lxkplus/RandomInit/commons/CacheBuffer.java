@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.javafaker.Faker;
 import com.lxkplus.RandomInit.exception.NormalErrorException;
-import com.lxkplus.RandomInit.service.MysqlCheckService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
@@ -20,9 +19,6 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class CacheBuffer {
-
-    @Resource
-    MysqlCheckService mysqlCheckService;
 
     static final String SEP = "_";
 
@@ -49,8 +45,6 @@ public class CacheBuffer {
     }
 
     public long getIncrease(String actionID, String str, long startNumber, long minStep, long maxStep) throws NormalErrorException {
-        mysqlCheckService.checkActionIDSafe(actionID);
-
         str = actionID + SEP + str;
         long num = (Long) cache.getOrDefault(str, startNumber - 1);
         cache.put(str, num + faker.number().numberBetween(minStep, maxStep));
@@ -58,7 +52,6 @@ public class CacheBuffer {
     }
 
     public long getIncrease(String actionID, String str, long startNumber) throws NormalErrorException {
-        mysqlCheckService.checkActionIDSafe(actionID);
 
         str = actionID + SEP + str;
         Long num = (Long) cache.getOrDefault(str, startNumber - 1);
@@ -67,8 +60,6 @@ public class CacheBuffer {
     }
 
     public Date getTime(String actionID, String str, Date startTime, int minSecond, int maxSecond) throws NormalErrorException {
-        mysqlCheckService.checkActionIDSafe(actionID);
-
         str = actionID + SEP + str;
         Date time = DateUtils.addSeconds((Date) cache.getOrDefault(str, startTime), faker.number().numberBetween(minSecond, maxSecond));
         cache.put(str, time);
@@ -76,8 +67,6 @@ public class CacheBuffer {
     }
 
     public Date getTime(String actionID, String str, Date startTime) throws NormalErrorException {
-        mysqlCheckService.checkActionIDSafe(actionID);
-
         str = actionID + SEP + str;
         Date time = DateUtils.addSeconds((Date) cache.getOrDefault(str, startTime), 60);
         cache.put(str, time);
@@ -85,8 +74,6 @@ public class CacheBuffer {
     }
 
     public String createRandomPoolName(String actionID) throws NormalErrorException {
-        mysqlCheckService.checkActionIDSafe(actionID);
-
         String uuid = faker.internet().uuid().replace("_", "");
         String poolName = actionID + "_" + uuid;
         poolCache.put(poolName, new LinkedHashSet<>());
@@ -94,15 +81,11 @@ public class CacheBuffer {
     }
 
     public void putIntoPool(String actionID, String poolName, List<String> data) throws NormalErrorException {
-        mysqlCheckService.checkActionIDSafe(actionID);
-
         poolName = actionID + SEP + poolName;
         poolCache.computeIfAbsent(poolName, k -> new LinkedHashSet<>()).addAll(data);
     }
 
     public void putIntoPool(String actionID, String poolName, String data) throws NormalErrorException {
-        mysqlCheckService.checkActionIDSafe(actionID);
-
         poolName = actionID + SEP + poolName;
         poolCache.computeIfAbsent(poolName, k -> new LinkedHashSet<>()).add(data);
     }
@@ -110,8 +93,6 @@ public class CacheBuffer {
     // 从池子里面获取数据的时候是随机的
     // 当获取完成以后，会形成循环
     public String readFromPool(String actionID, String poolName) throws NormalErrorException {
-        mysqlCheckService.checkActionIDSafe(actionID);
-
         poolName = actionID + SEP + poolName;
         if (!poolCache.containsKey(poolName)) {
             return null;
@@ -123,8 +104,6 @@ public class CacheBuffer {
     }
 
     public void clearPool(String actionID) throws NormalErrorException {
-        mysqlCheckService.checkActionIDSafe(actionID);
-
         ArrayList<String> strings = new ArrayList<>(poolCache.keySet());
         for (String string : strings) {
             if (string.startsWith(actionID + SEP)) {

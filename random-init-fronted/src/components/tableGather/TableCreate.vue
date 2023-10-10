@@ -118,7 +118,10 @@
 
   <n-divider/>
 
-  <Code v-model:code="code"></Code>
+  <div style="margin-right: 5%">
+    <Code v-model:code="code"></Code>
+  </div>
+
 
   <InputSQL v-model:inputSQLParams="inputSQLParams"
             v-model:createSql="createSql"
@@ -129,12 +132,12 @@
 
 <script>
 import {defineComponent} from "vue";
-import Code from "./Code.vue";
-import MysqlTypeSelect from "./MysqlTypeSelect.vue";
+import Code from "../Code.vue";
+import MysqlTypeSelect from "../MysqlTypeSelect.vue";
 import InputSQL from "./InputSQL.vue";
-import mysqlParams from "../hooks/mysqlParams";
-import getHook from "../hooks/getHook";
-import postMapper from "../hooks/postMapper";
+import mysqlParams from "../../hooks/mysqlParams";
+import getHook from "../../hooks/getHook";
+import postMapper from "../../hooks/postMapper";
 import {
   ChevronDoubleUp16Regular as upIcon,
   ChevronDoubleDown16Filled as downIcon,
@@ -144,7 +147,7 @@ import {
   AddBoxOutlined as addIcon,
   IndeterminateCheckBoxOutlined as removeIcon
 } from "@vicons/material"
-import messageHook from "../hooks/messageHook";
+import messageHook from "../../hooks/messageHook";
 
 export default defineComponent({
   name: "tableCreate",

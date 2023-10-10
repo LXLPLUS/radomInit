@@ -39,7 +39,7 @@ public class CreateSqlServiceImpl extends ServiceImpl<CreateSqlMapper, CreateSql
     CreateSqlMapper createSqlMapper;
 
     @Override
-    public TestDDL testAndSaveDDL(String sql) {
+    public TestDDL testThenSaveDDL(String sql) {
 
         TestDDL testDDL = new TestDDL();
         if (StringUtils.isBlank(sql)) {
@@ -62,6 +62,11 @@ public class CreateSqlServiceImpl extends ServiceImpl<CreateSqlMapper, CreateSql
                 createSql.setActionId(actionID);
                 createSql.setCreateSql(statement.toString());
                 createSql.setTableName(StringUtils.strip(statement.getTableName(), "`"));
+                createSql.setColumnsCount(statement.getColumnDefinitions().size());
+                createSql.setIndexCount(statement.getMysqlKeys().size());
+                if (statement.getComment() != null) {
+                    createSql.setComment(StringUtils.strip(statement.getComment().toString(), "'"));
+                }
                 createSqlMapper.insert(createSql);
 
                 // 一切都完成以后返回状态为成功

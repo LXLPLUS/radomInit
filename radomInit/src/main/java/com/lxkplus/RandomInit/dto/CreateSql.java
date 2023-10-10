@@ -1,56 +1,61 @@
 package com.lxkplus.RandomInit.dto;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.Date;
 
-/**
- * 建表语句记录
- * @TableName t_create_sql
- */
-@TableName(value ="t_create_sql")
 @Data
-public class CreateSql implements Serializable {
+@TableName("t_create_sql")
+public class CreateSql {
     /**
      * id
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(
+            type = IdType.AUTO
+    )
+    @NotNull
     private Integer id;
 
-    /**
-     * 
-     */
+    @NotNull
     private Date createTime;
 
-    /**
-     * 
-     */
+    @NotNull
     private Date updateTime;
 
     /**
      * 操作ID
      */
+    @NotNull
     private String actionId;
 
     /**
      * 建表语句
      */
+    @NotNull
     private String createSql;
 
+    @NotNull
     private String tableName;
 
     /**
-     * 
+     * 注释
      */
-    private Integer isDelete;
+    private String comment;
 
-    @Serial
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
+    /**
+     * 行数
+     */
+    private Integer columnsCount;
+
+    /**
+     * 索引数
+     */
+    private Integer indexCount;
+
+    @NotNull
+    private Short isDelete;
 }

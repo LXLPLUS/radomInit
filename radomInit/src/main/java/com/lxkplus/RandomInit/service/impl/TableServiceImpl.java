@@ -207,7 +207,6 @@ public class TableServiceImpl implements TableService {
         if (sqlStatement instanceof MySqlCreateTableStatement statement) {
             StringOptional.of(statement.getTableName())
                     .trim("`")
-                    .lowerUnderscoreToLowerCamel()
                     .next(tableParams.getTableHeader()::setTableName);
 
             tableParams.getTableHeader()

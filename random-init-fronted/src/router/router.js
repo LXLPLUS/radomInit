@@ -1,13 +1,13 @@
 import { createRouter, createWebHashHistory } from "vue-router"
-import LoginAndRegister from "../components/LoginAndRegister.vue"
+import LoginAndRegister from "../components/login/LoginAndRegister.vue"
 import Regex from "../components/Regex.vue"
 import Enum from "../components/Enum.vue"
 import BuilderRuler from "../components/BuilderRuler.vue"
-import TableCreate from "../components/TableCreate.vue"
+import TableCreate from "../components/tableGather/TableCreate.vue"
 import {
     createDiscreteApi
 } from 'naive-ui'
-import logExplain from "../components/LogExplain.vue";
+import logExplain from "../components/login/LogExplain.vue";
 import TableList from "../components/TableList/TableList.vue";
 const { message } = createDiscreteApi(
     ["message"]
