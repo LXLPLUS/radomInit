@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.lxkplus</groupId>
-    <artifactId>RandoomInit</artifactId>
+    <artifactId>RandomInit</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>RandomInit</name>
     <description>RandomInit</description>
